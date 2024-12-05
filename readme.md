@@ -8,7 +8,11 @@ Ce projet vise à créer un escape game autour de la robotique. Il est structur�
 
 ## Schémas
 
+### Synthese
+![Synthese projet](Schémas/synthese_projet.png)
 
+### Sprint 1 :
+![Issues Board](<Schémas/issues board.png>)
 
 ## Structure du projet
 
@@ -18,7 +22,7 @@ Le projet est divisé en plusieurs parties, chacune représentant un lot d'épre
 - [Lot d'épreuves de détection](./Detection/readme.md) : Mise en œuvre des systèmes de détection d'émotions ou de visage.
 - [Lot d'épreuves IA](./IA/readme.md) : Développement des algorithmes d'intelligence artificielle utilisés pour interagir avec les joueurs avec des énigmes.
 - [Robot Pepper](./Pepper/readme.md) : Contrôle et gestion du robot Pepper utilisé comme guide et assistant dans le jeu.
-- [Home Assistant](<./Home Assistant/readme.md>) : Contrôle de l'escape game et des triggers
+- [Unité central](<./Unité central/readme.md>) : Contrôle de l'escape game et des triggers
 
 
 ## Installation
