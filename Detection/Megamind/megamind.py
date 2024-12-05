@@ -2,7 +2,10 @@
 
 import cv2
 import numpy as np
-import time  # Importation du module pour mesurer le temps
+import time 
+import random
+
+from mqtt import send_mqtt
 
 # For OpenCV2 image display
 WINDOW_NAME = 'Megamind'
@@ -75,18 +78,32 @@ def color_name_to_color_code(valeur):
         print('Couleur mal orthographiée ou non prise en compte')
         return None, None
 
+def random_goal(all_colors):
+    # Choisir aléatoirement 4 couleurs parmi les couleurs possibles sans répétition
+    new_goals = random.sample(all_colors, 4)
+    
+    # Afficher les nouveaux objectifs générés
+    print(f"Nouvel objectif : {new_goals}")
+    
+    return new_goals
+
 
 if __name__ == '__main__':
     # Liste des couleurs à détecter
-    colors_to_detect = ['vert_clair', 'vert_fonce', 'bleu_clair', 'bleu_fonce', 'rouge', 'rose', 'jaune']
+    all_colors = ['vert_clair', 'vert_fonce', 'bleu_clair', 'bleu_fonce', 'rouge', 'rose', 'jaune']
 
-    goals = ['bleu_clair', 'bleu_fonce', 'rouge', 'rose']
+    goals = random_goal(all_colors)
+    print(goals)
     correcte = 0
     malPlace = 0
+    essais = 0
+    essais_max = 0
+
+    backup_detected_colors = ['','','','']
 
     # Création d'un dictionnaire avec les plages de couleurs HSV
     color_ranges = {}
-    for color in colors_to_detect:
+    for color in all_colors:
         lower_color, upper_color = color_name_to_color_code(color)
         if lower_color is not None and upper_color is not None:
             color_ranges[color] = (lower_color, upper_color)
@@ -124,15 +141,23 @@ if __name__ == '__main__':
             print(f"Couleurs détectées : {detected_colors}")
 
             if all(color is not None for color in detected_colors):
-                for index, goal in enumerate(goals):
-                    if goal == detected_colors[index]:
-                        correcte += 1
-                    elif goal in detected_colors:
-                        malPlace +=1
-                
-                print(f"Correcte : {correcte} Mal placé : {malPlace}")
-                correcte = 0
-                malPlace = 0
+                if backup_detected_colors != detected_colors:
+                    backup_detected_colors = detected_colors
+                    essais += 1
+                    for index, goal in enumerate(goals):
+                        if goal == detected_colors[index]:
+                            correcte += 1
+                        elif goal in detected_colors:
+                            malPlace +=1
+                    
+                    print(f"Correcte : {correcte} Mal placé : {malPlace}")
+                    correcte = 0
+                    malPlace = 0
+                    if correcte == 4:
+                        print("bravo !!!!")
+                    elif essais >= essais_max:
+                        goals = random_goal(all_colors)
+                        essais = 0
 
             start_time = current_time
             
