@@ -33,6 +33,9 @@ class MQTTHandler:
     TOPIC_TEXTE_STATUS = "ia/texte/status"
     TOPIC_VOCALE_STATUS = "ia/vocale/status"
     TOPIC_LABYRINTHE_STATUS = "ia/labyrinthe/status"
+    
+    # Game topic for clock
+    TOPIC_GAME_TIME = "game/time"
 
     def __init__(self, message_callback: Callable):
         self.client = mqtt.Client()
@@ -95,6 +98,12 @@ class MQTTHandler:
         for workshop in self.cmd_topics:
             self.client.publish(self.cmd_topics[workshop], "reset")
             print(f"Reset command sent to {workshop}")
+
+    def clock_publish(self, time_str: str):
+        """Publishes the time to the game time topic."""
+        self.client.publish(self.TOPIC_GAME_TIME, time_str)
+        #print(f"Time remaining: {time_str}")
+
 
     def run(self):
         """Connects to the broker and starts the loop to process messages."""
