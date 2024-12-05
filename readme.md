@@ -1,4 +1,4 @@
-# Projet ESCAPE GAME
+# Projet escape game : MISSION TRANSFERT
 
 Ce projet a été réalisé par Elea Machillot, Julien Perbet, David Jeannin, et Anaïs Delcamp.
 
