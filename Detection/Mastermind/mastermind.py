@@ -156,7 +156,7 @@ if __name__ == '__main__':
                     
                     print(f"Correcte : {correcte} Mal placé : {malPlace}")
                     # Envoyer les résultats MQTT
-                    data = {'correcte': correcte, 'mal_place': malPlace}
+                    data = {'correcte': correcte, 'mal_place': malPlace, 'essais' : f"{essais}/{essais_max}"}
                     mqtt_service.publish(data)
                     
                     if correcte == 4:

@@ -1,17 +1,21 @@
 #include <WiFi.h>
 #include <MQTT.h>
 #include <ArduinoJson.h>
+#include <TFT_eSPI.h> 
+#include <SPI.h>
+
+TFT_eSPI tft = TFT_eSPI();
 
 // Déclaration des broches où sont connectées les LEDs
-const int ledRedPin1 = 7; // LED sur la broche 7
-const int ledRedPin2 = 0; // LED sur la broche 0
-const int ledRedPin3 = 1; // LED sur la broche 1
-const int ledRedPin4 = 8; // LED sur la broche 8
+const int ledRedPin1 = 33; // LED sur la broche 7 ESP-C6
+const int ledRedPin2 = 25; // LED sur la broche 0 ESP-C6
+const int ledRedPin3 = 26; // LED sur la broche 1 ESP-C6
+const int ledRedPin4 = 27; // LED sur la broche 8 ESP-C6
 
-const int ledGreenPin1 = 23; // LED sur la broche 7
-const int ledGreenPin2 = 22; // LED sur la broche 0
-const int ledGreenPin3 = 21; // LED sur la broche 1
-const int ledGreenPin4 = 20; // LED sur la broche 8
+const int ledGreenPin1 = 2; // LED sur la broche 7 ESP-C6
+const int ledGreenPin2 = 15; // LED sur la broche 0 ESP-C6
+const int ledGreenPin3 = 13; // LED sur la broche 1 ESP-C6
+const int ledGreenPin4 = 12; // LED sur la broche 8 ESP-C6
 
 const char ssid[] = "RobotiqueCPE";
 const char pass[] = "AppareilLunaire:DauphinRadio";
@@ -108,12 +112,19 @@ void messageReceived(String &topic, String &payload) {
   // Récupérez les valeurs "correcte" et "mal_place"
   int correcte = doc["correcte"];
   int malPlace = doc["mal_place"];
+  String essais = doc["essais"];
 
   // Affichez les valeurs récupérées
   Serial.print("Correcte: ");
   Serial.println(correcte);
   Serial.print("Mal placé: ");
   Serial.println(malPlace);
+  Serial.print("Essais: ");
+  Serial.println(essais);
+
+  tft.fillRect(0, 0, 240, 40, TFT_BLACK);
+  tft.setCursor(10, 20);  // Position du texte
+  tft.printf("%d", essais);
 
    // Faire clignoter les LEDs 3 fois
   blinkAllLeds(3, 300); // 3 clignotements avec 300ms d'intervalle
@@ -158,6 +169,14 @@ void setup() {
   digitalWrite(ledGreenPin2, LOW); 
   digitalWrite(ledGreenPin3, LOW);
   digitalWrite(ledGreenPin4, LOW);
+
+  tft.init();  // Initialiser l'écran
+  delay(1000);
+  tft.setRotation(2);  // Orientation de l'écran
+  tft.fillScreen(TFT_BLACK);  // Efface l'écran avec du noir
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);  // Couleur du texte (blanc sur noir)
+  tft.setTextSize(2);  // Taille du texte
+  delay(1000);
 }
 
 void loop() {
