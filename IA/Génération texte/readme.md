@@ -9,7 +9,3 @@
 ### Étapes d'installation
 
 ## Fonctionnalités
-
-- [ ] ToF
-    - [ ] blabla
-    - [X] blabla
