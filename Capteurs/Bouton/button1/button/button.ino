@@ -2,88 +2,59 @@
 #include <MQTT.h>
 
 // Informations WiFi et MQTT
-const char* ssid = "VotreSSID"; 
-const char* password = "VotrePassword"; 
-const char* mqtt_server = "IP_SERVEUR_MQTT";  
+const char ssid[] = "RobotiqueCPE";
+const char pass[] = "AppareilLunaire:DauphinRadio";
+const char mqtt_server[] = "134.214.51.148";
 
-// Pin du bouton
-const int buttonPin = 19;  
+// Définition du bouton
+const int buttonPin = 20; // GPIO pour le bouton
+const char* topic = "button1"; // Topic pour publier l'état du bouton
 
-// Identifiant unique pour ce bouton
-const char* buttonId = "bouton1"; 
+// Variables pour gérer les changements d'état
+bool previousState = HIGH;
 
-// Initialisation de la connexion WiFi et MQTT
 WiFiClient net;
 MQTTClient client;
 
-// Variables pour détecter les changements d'état du bouton
-bool previousState = HIGH;
-
-void connectWiFi() {
-  Serial.print("Connexion à ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nWiFi connecté.");
-  Serial.print("Adresse IP : ");
-  Serial.println(WiFi.localIP());
-}
-
 void connectMQTT() {
-  while (!client.connected()) {
-    Serial.print("Connexion au broker MQTT...");
-    if (client.connect(buttonId)) {
-      Serial.println("Connecté au broker MQTT");
-    } else {
-      Serial.print("Échec, état : ");
-      Serial.println(client.lastError());
-      delay(5000);
-    }
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(1000);
   }
+
+  while (!client.connect("ESP-Button1")) {
+    Serial.print(".");
+    delay(1000);
+  }
+
+  Serial.println("\nConnecté au broker MQTT.");
 }
 
 void setup() {
   Serial.begin(115200);
-
-  // Configuration du bouton en entrée avec pull-up
-  pinMode(buttonPin, INPUT_PULLUP);
-
-  // Connexion WiFi
-  connectWiFi();
-
-  // Connexion au serveur MQTT
+  WiFi.begin(ssid, pass);
   client.begin(mqtt_server, net);
+
+  pinMode(buttonPin, INPUT_PULLUP); // Bouton avec résistance pull-up interne
+  connectMQTT();
 }
 
 void loop() {
-  // Reconnexion MQTT si nécessaire
   if (!client.connected()) {
     connectMQTT();
   }
   client.loop();
 
-  // Lecture de l'état du bouton
   bool currentState = digitalRead(buttonPin);
-
-  // Détection d'un changement d'état (appui ou relâchement)
   if (currentState != previousState) {
     previousState = currentState;
 
-    // Construction du message MQTT
-    String message = (currentState == LOW) ? "appuyé" : "relâché";
-    Serial.print("Bouton ");
-    Serial.print(buttonId);
-    Serial.print(": ");
-    Serial.println(message);
+    // Publier l'état du bouton
+    String message = (currentState == LOW) ? "appuye" : "relache";
+    client.publish(topic, message.c_str());
 
-    // Publication de l'état du bouton sur un topic MQTT
-    String topic = String("/atelier/") + buttonId;
-    client.publish(topic.c_str(), message.c_str());
+    Serial.printf("Bouton 1 : %s\n", message.c_str());
   }
 
-  delay(50);  // Anti-rebond léger
+  delay(50); // Anti-rebond
 }
