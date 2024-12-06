@@ -13,7 +13,7 @@ python game_master.py
 
 ### Lot "detection"
 - `detection/bi-camera/cmd` : Commandes pour le workshop bi-camera
-- `detection/megaming/cmd` : Commandes pour le workshop megaming
+- `detection/masterming/cmd` : Commandes pour le workshop masterming
 - `detection/emotions/cmd` : Commandes pour le workshop emotions
 - `detection/photo/cmd` : Commandes pour le workshop photo
 
@@ -31,7 +31,7 @@ python game_master.py
 
 ### Lot "detection"
 - `detection/bi-camera/status` : État du workshop bi-camera
-- `detection/megaming/status` : État du workshop megaming
+- `detection/masterming/status` : État du workshop masterming
 - `detection/emotions/status` : État du workshop emotions
 - `detection/photo/status` : État du workshop photo
 

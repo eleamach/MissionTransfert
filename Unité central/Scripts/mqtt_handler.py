@@ -9,7 +9,7 @@ class MQTTHandler:
     
     # Command topics for "detection" lot
     TOPIC_BICAMERA_CMD = "detection/bi-camera/cmd"
-    TOPIC_MEGAMING_CMD = "detection/megaming/cmd"
+    TOPIC_MASTERMING_CMD = "detection/masterming/cmd"
     TOPIC_EMOTIONS_CMD = "detection/emotions/cmd"
     TOPIC_PHOTO_CMD = "detection/photo/cmd"
     
@@ -25,7 +25,7 @@ class MQTTHandler:
     
     # Status topics for "detection" lot
     TOPIC_BICAMERA_STATUS = "detection/bi-camera/status"
-    TOPIC_MEGAMING_STATUS = "detection/megaming/status"
+    TOPIC_MASTERMING_STATUS = "detection/masterming/status"
     TOPIC_EMOTIONS_STATUS = "detection/emotions/status"
     TOPIC_PHOTO_STATUS = "detection/photo/status"
     
@@ -51,7 +51,7 @@ class MQTTHandler:
             self.TOPIC_TOF_STATUS: "tof",
             # Detection lot
             self.TOPIC_BICAMERA_STATUS: "bicamera",
-            self.TOPIC_MEGAMING_STATUS: "megaming",
+            self.TOPIC_MASTERMING_STATUS: "masterming",
             self.TOPIC_EMOTIONS_STATUS: "emotions",
             self.TOPIC_PHOTO_STATUS: "photo",
             # IA lot
@@ -68,7 +68,7 @@ class MQTTHandler:
             "tof": self.TOPIC_TOF_CMD,
             # Detection lot
             "bicamera": self.TOPIC_BICAMERA_CMD,
-            "megaming": self.TOPIC_MEGAMING_CMD,
+            "masterming": self.TOPIC_MASTERMING_CMD,
             "emotions": self.TOPIC_EMOTIONS_CMD,
             "photo": self.TOPIC_PHOTO_CMD,
             # IA lot

@@ -1,4 +1,4 @@
-# Epreuve Megamind  
+# Epreuve Mastermind  
 
 ## Description 
 

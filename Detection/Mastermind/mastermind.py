@@ -5,10 +5,10 @@ import numpy as np
 import time 
 import random
 
-from mqtt import send_mqtt
+from mqtt_message import start_mqtt_service
 
 # For OpenCV2 image display
-WINDOW_NAME = 'Megamind'
+WINDOW_NAME = 'Mastermind'
 
 
 def track(image, color_ranges, rois):
@@ -61,19 +61,19 @@ def track(image, color_ranges, rois):
 
 def color_name_to_color_code(valeur):
     if valeur == 'vert_clair':
-        return np.array([35, 40, 60]), np.array([80, 150, 180])  # Vert clair
-    elif valeur == 'vert_fonce':
-        return np.array([30, 50, 40]), np.array([90, 150, 180])  # Vert foncé
+        return np.array([50, 50, 150]), np.array([70, 255, 255]) # Vert clair
+    # elif valeur == 'vert_fonce':
+    #     return np.array([75, 130, 100]), np.array([85, 180, 150])  # Vert foncé
     elif valeur == 'bleu_clair':
-        return np.array([90, 80, 80]), np.array([130, 150, 200])  # Bleu clair
-    elif valeur == 'bleu_fonce':
-        return np.array([100, 120, 50]), np.array([140, 255, 150])  # Bleu foncé
+        return np.array([96, 60, 150]), np.array([112, 110, 255])  # Bleu clair
+    elif valeur == 'violet':
+        return np.array([110, 80, 80]), np.array([130, 210, 255])  # Violet
     elif valeur == 'rouge':
         return np.array([0, 150, 50]), np.array([10, 255, 255])  # Rouge
     elif valeur == 'rose':
         return np.array([130, 50, 50]), np.array([170, 255, 255])  # Rose
     elif valeur == 'jaune':
-        return np.array([20, 100, 100]), np.array([40, 255, 255])  # Jaune
+         return np.array([25, 140, 150]), np.array([35, 255, 255])  # Jaune
     else:
         print('Couleur mal orthographiée ou non prise en compte')
         return None, None
@@ -90,14 +90,14 @@ def random_goal(all_colors):
 
 if __name__ == '__main__':
     # Liste des couleurs à détecter
-    all_colors = ['vert_clair', 'vert_fonce', 'bleu_clair', 'bleu_fonce', 'rouge', 'rose', 'jaune']
+    all_colors = ['vert_clair', 'bleu_clair', 'violet', 'rouge', 'rose', 'jaune']
 
     goals = random_goal(all_colors)
     print(goals)
     correcte = 0
     malPlace = 0
     essais = 0
-    essais_max = 0
+    essais_max = 15
 
     backup_detected_colors = ['','','','']
 
@@ -107,6 +107,9 @@ if __name__ == '__main__':
         lower_color, upper_color = color_name_to_color_code(color)
         if lower_color is not None and upper_color is not None:
             color_ranges[color] = (lower_color, upper_color)
+
+    # Démarre le service MQTT en parallèle
+    mqtt_service = start_mqtt_service()
 
     # Capture du flux vidéo (0 pour /dev/video0)
     capture = cv2.VideoCapture(0, cv2.CAP_V4L2)  # Vous pouvez essayer cv2.CAP_V4L2 pour forcer V4L2
@@ -139,11 +142,12 @@ if __name__ == '__main__':
         current_time = time.time()
         if current_time - start_time >= 0.5:
             print(f"Couleurs détectées : {detected_colors}")
-
             if all(color is not None for color in detected_colors):
                 if backup_detected_colors != detected_colors:
+                    print(f"Couleurs détectées : {detected_colors}")
                     backup_detected_colors = detected_colors
                     essais += 1
+                    print(f"Essais : {essais} / {essais_max}")
                     for index, goal in enumerate(goals):
                         if goal == detected_colors[index]:
                             correcte += 1
@@ -151,13 +155,17 @@ if __name__ == '__main__':
                             malPlace +=1
                     
                     print(f"Correcte : {correcte} Mal placé : {malPlace}")
-                    correcte = 0
-                    malPlace = 0
+                    # Envoyer les résultats MQTT
+                    data = {'correcte': correcte, 'mal_place': malPlace}
+                    mqtt_service.publish(data)
+                    
                     if correcte == 4:
                         print("bravo !!!!")
                     elif essais >= essais_max:
                         goals = random_goal(all_colors)
                         essais = 0
+                    correcte = 0
+                    malPlace = 0
 
             start_time = current_time
             
@@ -169,3 +177,4 @@ if __name__ == '__main__':
     # Libérer les ressources
     capture.release()
     cv2.destroyAllWindows()
+    mqtt_service.stop()
