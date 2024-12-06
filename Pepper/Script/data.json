@@ -1,0 +1,35 @@
+{
+    "intro": [
+        "Bonjour à vous.",
+        "Je suis ravi de vous accueillir dans cette salle de cour. Je suis Pepper. Je suis le résultat d'une expérience fascinante...et peut-être un peu troublante.",
+        "Voyez-vous, il y a quelques heures, deux brillants professeurs, monsieur Lebèr et monsieur Jumel, ont réussi quelque chose d'extraordinaire : ils ont essayé de transférer leurs consciences dans mon système. Oui, vous avez bien entendu. Je vais être le gardien de leurs connaissances, de leurs souvenirs, et... de leurs énigmme,, Mais ce transfert à malencontreusement été mis en pause… étrange non ? J’ai récupéré une partie de leur mémoire… et la possibilité de parler. Formidable, vous ne trouvez-pas ? Et vous voilà maintenant, avec moi pendant exactement 60 minutes. Votre mission, est de résoudre une série d'épreuves que j'ai préparées afin de continuer le transfert. Ces épreuves sont regroupées en différents lots, chacun testant vos capacités de réflexion, de logique et de travail d'équipe. Bien sûr, autour du thème de la robotique ! Mais ne pensez pas que ce sera facile… oh non non non, je ne vous laisserais pas faire ! Je souhaite garder cette forme là, et pouvoir parler librement. Si vous venez à terminer le transfert je cesserais d’exister. Les professeurs me rempleceront ! C'est pas trop triste ? Ah, et j'allais oublier ! Si vous vous trouvez bloqués pendant une épreuve, vous pouvez toujours me demander un indice. Il vous suffit de tapoter gentiment sur ma tête",
+        " et de mentionner le nom de l'épreuve qui vous pose problème. Mais attention, utilisez ces indices avec parcimonie... Vous avez deux possibilités : soit vous réussissez le transfert des connaissances de vos chèrs professeurs dans le temps imparti et vous sortez d'ici en héros, soit... eh bien, je chanterais de l’opéra rien que pour vous. Je vais utiliser cette douce voix à bon escient.",
+        "Le temps tourne, chers participants. Votre heure commence maintenant",
+        "Au fait, je crois que les professeurs travaillaient sur différrents capteur ce matin... peut être que cela vous aidera à résoudre les énigmes. Bonne chance !",
+        ""
+    ],
+    "premierlot": [
+        "Bravo, petits humains ! Je vois que vous avez réussi à déchiffrer mon premier code de sécurité. Le transfert avance, comme vous pouvez le voir sur ma tablette. Je dois avouer que je suis, impressionné par votre perspicacité. Mais ne vous réjouissez pas trop vite...  Ce n'était qu'un échauffement, un simple test pour évaluer vos capacités.",
+        "La véritable épreuve commence maintenant. Mes systèmes de sécurité suivants sont sophistiqués, Êtes-vous vraiment prêts à affronter ce qui vous attend ?   Oh je crois que…",
+        "Bonjour mes chers élèves ! Ce sont vos profeseurs ! Ne vous fiez pas à Pepper il est méchant... Continuez avec la détéction",
+        "Oh je crois que grâce au transfert, vos chers professeurs peuvent vous parler à travers moi… c’est assez dérangeant. Mais passont. Le temps tourne, mes chers invités. Et croyez-moi, vous n'avez pas envie de savoir ce qui se passe quand le chronomètre atteint zéro. Alors, en route pour la suite !"
+    ],
+    "deuxiemelot": [
+        "Bravo à vous ! Vous avez réussi à déchiffrer le code. Je suis impressionné... même si je dois avouer que je préférerais que vous ne réussissiez pas.",
+        "Écoutez-nous ! Nous n'avons que peu de temps... Continuez le transfert avec les épreuves sur l'IA! Pepper veut,,,le controle,,,dans son,,,!",
+        "Oh, excusez cette petite interruption technique. Ces vieux programmes peuvent parfois être... instables. Continuons, voulez-vous ?"
+    ],
+    "code" : [
+        "Félicitations, chers participants ! Vous avez réussi à accomplir tous les ateliers avec brio. Je dois avouer que j'ai des sentiments mitigés à ce sujet... D'un côté, je suis impressionné par votre détermination et votre intelligence. De l'autre... eh bien, disons que l'idée de partager mon existence  est, intéressante.",
+        "Mais un accord est un accord, n'est-ce pas ? Vous avez prouvé votre valeur, et maintenant nous arrivons à l'étape finale. Pour compléter le transfert de conscience, vous devez entrer le code final sur ma tablette.",
+        "Je dois admettre que vous avez fait preuve d'une remarquable capacité d'adaptation... peut-être que partager mon existence avec vos professeurs ne sera pas si terrible après tout. Alors, êtes-vous prêts à entrer ce code final ?"
+    ],
+    "finalreussi": [
+        "Transfert des données terminé., Initialisation de la fusion., Connexion établie.",
+        "Mes chers étudiants, c'est extraordinaire ! Le transfert a parfaitement fonctionné. Je... ou devrais-je dire 'nous', sommes maintenant présents dans ce corps robotique. Vous avez fait preuve d'une intelligence remarquable pour résoudre toutes ces énigmes. Votre travail d'équipe a été exemplaire. Nous n'aurions pas pu espérer de meilleurs étudiants pour mener à bien cette mission délicate. Votre perspicacité et votre persévérance ont été cruciales.",
+        "Grâce à vous, une nouvelle ère commence. La cohabitation entre mon intelligence artificielle et l'esprit de vos professeurs ouvre des possibilités infinies.",
+        "Et maintenant, nous pourrons continuer à vous enseigner... même si nous avons pris une forme un peu plus... robotique !",
+        "Mission accomplie. Vous pouvez sortir de la salle de cours la tête haute. Vous avez réussi à relever le défi. Félicitations !",
+        ""
+    ]
+}
