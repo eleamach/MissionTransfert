@@ -12,9 +12,13 @@ uint8_t green[16] = {0};
 uint8_t blue[16] = {0};
 bool buttons[16] = {false};
 
-// Variables pour éviter le spam
-unsigned long lastPressTime[16] = {0}; // Dernier temps de traitement pour chaque bouton
-const unsigned long debounceDelay = 1000; // Délai d'anti-spam en millisecondes
+// Variables pour la gestion des séquences
+int sequencePositions[5] = {0};       // Positions des LEDs pour la séquence
+uint8_t sequenceColors[5][3] = {0};   // Couleurs associées à chaque position
+int currentStep = 0;                  // Étape actuelle de la séquence
+unsigned long lastUpdateTime = 0;     // Dernière mise à jour de la séquence
+const unsigned long updateInterval = 500; // Intervalle entre chaque étape (en ms)
+bool sequenceActive = true;           // Indique si une séquence est en cours
 
 // Initialisation des broches SPI
 void setupSPI() {
@@ -34,7 +38,6 @@ void writeFrame(const uint8_t* frame) {
     digitalWrite(PIN_SCK, LOW);
     delayMicroseconds(5);
 
-    // Envoie le bit courant
     if (frame[i / 8] & (1 << (7 - (i % 8)))) {
       digitalWrite(PIN_MISO, HIGH);
     } else {
@@ -53,7 +56,6 @@ void readFrame(uint8_t* frame) {
     digitalWrite(PIN_SCK, LOW);
     delayMicroseconds(5);
 
-    // Lecture du bit courant
     if (digitalRead(PIN_MOSI)) {
       frame[i / 8] |= (1 << (7 - (i % 8)));
     } else {
@@ -87,38 +89,68 @@ void commit() {
 
 // Fonction pour éteindre toutes les LEDs
 void blackout() {
-  memset(red, 0, sizeof(red));   // Éteint toutes les LEDs rouges
-  memset(green, 0, sizeof(green)); // Éteint toutes les LEDs vertes
-  memset(blue, 0, sizeof(blue));  // Éteint toutes les LEDs bleues
-  commit(); // Met à jour l'état des LEDs
+  memset(red, 0, sizeof(red));
+  memset(green, 0, sizeof(green));
+  memset(blue, 0, sizeof(blue));
+  commit();
 }
 
-// Active une couleur aléatoire pour une LED
-void setRandomColorForButton(int buttonIndex) {
-  blackout(); // Éteint toutes les LEDs avant d'activer une nouvelle
-  if (buttonIndex >= 0 && buttonIndex < 16) {
-    int randomColor = random(4); // Génère un entier entre 0 et 3
-    if (randomColor == 0) {
-      red[buttonIndex] = 255;   // Rouge
-    } else if (randomColor == 1) {
-      green[buttonIndex] = 255; // Vert
-    } else if (randomColor == 2) {
-      blue[buttonIndex] = 255;  // Bleu
-    } else if (randomColor == 3) {
-      red[buttonIndex] = 255;   // Jaune (Rouge + Vert)
-      green[buttonIndex] = 255;
+// Génère une séquence aléatoire avec des couleurs fixes (rouge, vert, bleu)
+void generateSequence() {
+  blackout(); // Éteint toutes les LEDs
+
+  for (int i = 0; i < 5; i++) {
+    sequencePositions[i] = random(16); // Position aléatoire entre 0 et 15
+
+    // Couleurs fixes attribuées de manière aléatoire
+    int randomColorIndex = random(3); // Choix entre 0 (Rouge), 1 (Vert), 2 (Bleu)
+    if (randomColorIndex == 0) {
+      sequenceColors[i][0] = 255; // Rouge
+      sequenceColors[i][1] = 0;   // Pas de Vert
+      sequenceColors[i][2] = 0;   // Pas de Bleu
+    } else if (randomColorIndex == 1) {
+      sequenceColors[i][0] = 0;   // Pas de Rouge
+      sequenceColors[i][1] = 255; // Vert
+      sequenceColors[i][2] = 0;   // Pas de Bleu
+    } else if (randomColorIndex == 2) {
+      sequenceColors[i][0] = 0;   // Pas de Rouge
+      sequenceColors[i][1] = 0;   // Pas de Vert
+      sequenceColors[i][2] = 255; // Bleu
     }
   }
-  commit(); // Envoie l'état au contrôleur
-}
 
-// Affiche l'état des boutons
-void printButtons() {
-  for (int i = 0; i < 16; i++) {
-    Serial.print("Button ");
+  // Affiche la séquence générée pour le débogage
+  Serial.println("Nouvelle séquence générée !");
+  for (int i = 0; i < 5; i++) {
+    Serial.print("Étape ");
     Serial.print(i);
-    Serial.print(": ");
-    Serial.println(buttons[i] ? "Pressed" : "Released");
+    Serial.print(": LED ");
+    Serial.print(sequencePositions[i]);
+    Serial.print(" Couleur ");
+    if (sequenceColors[i][0] == 255) {
+      Serial.println("Rouge");
+    } else if (sequenceColors[i][1] == 255) {
+      Serial.println("Vert");
+    } else if (sequenceColors[i][2] == 255) {
+      Serial.println("Bleu");
+    }
+  }
+}
+// Affiche l'étape actuelle de la séquence
+void processSequence() {
+  if (currentStep < 5) {
+    blackout(); // Éteint toutes les LEDs avant d'activer la suivante
+    int position = sequencePositions[currentStep];
+    red[position] = sequenceColors[currentStep][0];
+    green[position] = sequenceColors[currentStep][1];
+    blue[position] = sequenceColors[currentStep][2];
+    commit(); // Met à jour les LEDs
+    delay(500); // Maintient la LED allumée pendant 500 ms
+    blackout();
+    currentStep++;
+  } else {
+    currentStep = 0; // Réinitialise la séquence
+    sequenceActive = false; // Termine la séquence
   }
 }
 
@@ -126,31 +158,21 @@ void setup() {
   Serial.begin(115200);
   setupSPI();
 
-  // Initialisation
-  Serial.println("Test des LEDs avec couleurs aléatoires (rouge, vert, bleu, jaune).");
+  Serial.println("Initialisation...");
   blackout(); // Éteint toutes les LEDs au démarrage
 
-  randomSeed(analogRead(0)); // Initialisation de la génération aléatoire
+  randomSeed(analogRead(0)); // Initialise le générateur aléatoire
+  generateSequence(); // Crée une première séquence
 }
 
 void loop() {
   commit(); // Met à jour les boutons et LEDs
-  unsigned long currentTime = millis();
 
-  for (int i = 0; i < 16; i++) {
-    if (buttons[i]) { // Si un bouton est pressé
-      if (currentTime - lastPressTime[i] > debounceDelay) { // Vérifie le délai d'anti-spam
-        Serial.print("Button pressed: ");
-        Serial.println(i);
-
-        setRandomColorForButton(i); // Active une couleur aléatoire
-        delay(500);                 // Garde la LED allumée pendant 0,5 seconde
-        blackout();                 // Éteint la LED après 0,5 seconde
-
-        lastPressTime[i] = currentTime; // Met à jour le temps du dernier appui
-      }
+  if (sequenceActive) {
+    unsigned long currentTime = millis();
+    if (currentTime - lastUpdateTime >= updateInterval) {
+      lastUpdateTime = currentTime;
+      processSequence(); // Affiche l'étape suivante de la séquence
     }
   }
-
-  delay(50); // Pause légère pour lisser le comportement
 }
