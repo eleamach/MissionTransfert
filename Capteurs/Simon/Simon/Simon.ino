@@ -6,6 +6,11 @@
 #define PIN_MISO 20
 #define PIN_MOSI 19
 
+// GPIOs pour les LEDs de progression
+#define PIN_LED1  4
+#define PIN_LED2  5
+#define PIN_LED3  6
+
 // Buffers pour les LEDs et les boutons
 uint8_t red[16] = {0};
 uint8_t green[16] = {0};
@@ -90,6 +95,13 @@ void blackout() {
   commit();
 }
 
+// Contrôle des LEDs de progression
+void updateProgressionLEDs() {
+  digitalWrite(PIN_LED1, currentLevel >= 2 ? HIGH : LOW);
+  digitalWrite(PIN_LED2, currentLevel >= 3 ? HIGH : LOW);
+  digitalWrite(PIN_LED3, levelComplete ? HIGH : LOW);
+}
+
 // Génère une séquence aléatoire
 void generateSequence() {
   blackout();
@@ -114,14 +126,14 @@ void processSequence() {
     green[position] = sequenceColors[currentStep][1];
     blue[position] = sequenceColors[currentStep][2];
     commit();
-    delay(500); // Temps pour voir la LED
+    delay(500);
     blackout();
-    delay(300); // Pause entre les étapes
+    delay(300);
     currentStep++;
   } else {
     currentStep = 0;
     sequenceActive = false;
-    userInputMode = true; // Active le mode utilisateur
+    userInputMode = true;
     Serial.println("Reproduisez la séquence !");
   }
 }
@@ -143,7 +155,7 @@ void checkUserInput() {
           Serial.println("Étape réussie !");
           for (int j = 0; j < 3; j++) {
             blackout();
-            memset(green, 255, sizeof(green)); // LEDs en vert
+            memset(green, 255, sizeof(green));
             commit();
             delay(200);
             blackout();
@@ -151,28 +163,30 @@ void checkUserInput() {
             delay(200);
           }
           if (currentSequenceSize < maxSequenceSize) {
-            currentSequenceSize++; // Augmente la taille de la séquence
+            currentSequenceSize++;
           } else if (currentLevel == 1) {
-            Serial.println("Niveau 1 terminé, passage au niveau 2 !");
+            Serial.println("Niveau 1 terminé !");
             currentLevel = 2;
             currentSequenceSize = 1;
-            maxSequenceSize = 8; // Niveau 2 : 8 LEDs
+            maxSequenceSize = 8;
           } else if (currentLevel == 2) {
-            Serial.println("Niveau 2 terminé, passage au niveau 3 !");
+            Serial.println("Niveau 2 terminé !");
             currentLevel = 3;
             currentSequenceSize = 1;
-            maxSequenceSize = 10; // Niveau 3 : 10 LEDs
+            maxSequenceSize = 10;
           } else if (currentLevel == 3) {
             Serial.println("Niveau 3 terminé !");
             levelComplete = true;
           }
+          updateProgressionLEDs();
+          if (levelComplete) return;  // Ne pas réinitialiser après le niveau final
           resetGame();
         }
       } else {
         Serial.println("Mauvaise touche !");
         for (int j = 0; j < 3; j++) {
           blackout();
-          memset(red, 255, sizeof(red)); // LEDs en rouge
+          memset(red, 255, sizeof(red));
           commit();
           delay(200);
           blackout();
@@ -197,6 +211,15 @@ void resetGame() {
 void setup() {
   Serial.begin(115200);
   setupSPI();
+
+  pinMode(PIN_LED1, OUTPUT);
+  pinMode(PIN_LED2, OUTPUT);
+  pinMode(PIN_LED3, OUTPUT);
+  
+  digitalWrite(PIN_LED1, LOW);
+  digitalWrite(PIN_LED2, LOW);
+  digitalWrite(PIN_LED3, LOW);
+
   blackout();
   randomSeed(analogRead(0));
   generateSequence();
