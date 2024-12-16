@@ -1,13 +1,16 @@
 from flask import Flask, render_template, jsonify, request
 from openai import OpenAI
 from dotenv import load_dotenv
+from flask_socketio import SocketIO
 import os
 import threading
+import paho.mqtt.client as mqtt
 
 # Charger les variables d'environnement
 load_dotenv()
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # Variable globale pour stocker le contenu pré-généré
@@ -17,6 +20,15 @@ cached_content = {
 }
 
 CORRECT_COUNT = 5  # Le nombre correct de "robotique"
+
+def publish_mqtt_status():
+    try:
+        client_mqtt = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        client_mqtt.connect("localhost", 1883, 60)
+        client_mqtt.publish("ia/texte/status", "finish")
+        client_mqtt.disconnect()
+    except Exception as e:
+        print(f"Erreur lors de la publication MQTT: {e}")
 
 def generate_text_with_keywords(keyword, occurrences):
     prompt = f"""Génère un texte cohérent en français d'environ 100 mots qui utilise 
@@ -61,6 +73,25 @@ def generate_next_content():
 # Générer le premier contenu au démarrage
 generate_next_content()
 
+# Callback MQTT quand un message est reçu
+def on_message(client, userdata, message):
+    if message.topic == "ia/texte/cmd" and message.payload.decode() == "reset":
+        socketio.emit('reset_event')  # Envoie un événement au front
+
+# Configuration du client MQTT pour la souscription
+def setup_mqtt_subscriber():
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    client.on_message = on_message
+    try:
+        client.connect("localhost", 1883, 60)
+        client.subscribe("ia/texte/cmd")
+        client.loop_start()
+    except Exception as e:
+        print(f"Erreur lors de la connexion MQTT: {e}")
+
+# Appeler la configuration au démarrage
+setup_mqtt_subscriber()
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -97,10 +128,11 @@ def validate():
     
     if count == CORRECT_COUNT:
         print("REUSSI")
+        publish_mqtt_status()
         return jsonify({'success': True})
     else:
         print("ECHEC")
         return jsonify({'success': False})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)

@@ -173,7 +173,14 @@
         <button class="validate-button" onclick="validateCount()">✓</button>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
+        var socket = io();
+        
+        socket.on('reset_event', function() {
+            location.reload();  // Rafraîchit la page
+        });
+
         const generateBtn = document.getElementById('generateBtn');
         const loading = document.getElementById('loading');
         const audio = document.getElementById('audio');
