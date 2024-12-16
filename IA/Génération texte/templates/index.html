@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Radio</title>
+    <style>
+        body {
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .radio {
+            background-color: #34495e;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            width: 300px;
+        }
+        
+        .radio-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #e74c3c;
+            border: none;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .radio-button.playing {
+            background-color: #27ae60;  /* Vert quand en lecture */
+            animation: pulse 2s infinite;  /* Animation de pulsation */
+        }
+        
+        .radio-button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            }
+            50% {
+                transform: scale(0.95);
+                box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            }
+        }
+        
+        .loading {
+            color: #ecf0f1;
+            text-align: center;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .radio-label {
+            color: #ecf0f1;
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        /* Cache les contrôles audio mais permet la lecture */
+        #audio {
+            display: none;
+        }
+
+        .counter-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .counter-value {
+            background: #34495e;
+            color: #e74c3c;
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            padding: 5px 15px;
+            border-radius: 5px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .counter-button {
+            background: none;
+            border: none;
+            color: #ecf0f1;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        .validate-button {
+            background: #34495e;
+            border: none;
+            color: #ecf0f1;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .validate-button:hover {
+            background: #2c3e50;
+        }
+
+        .counter-value.success {
+            color: #f1c40f;  /* Jaune pour le succès */
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px #f1c40f; }
+            50% { text-shadow: 0 0 20px #f1c40f; }
+            100% { text-shadow: 0 0 5px #f1c40f; }
+        }
+
+        .error-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(231, 76, 60, 0.9);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .system-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-message" id="errorMessage">
+        Perte de signal de la radio... Reconnexion dans <span id="timer">10</span>s
+    </div>
+
+    <div class="radio" id="radioSystem">
+        <div class="radio-label">RADIO</div>
+        <button id="generateBtn" class="radio-button"></button>
+        <div class="loading" id="loading">Recherche du signal...</div>
+        <audio id="audio"></audio>
+    </div>
+
+    <div class="counter-container" id="counterSystem">
+        <button class="counter-button" onclick="updateCounter(-1)">-</button>
+        <div class="counter-value" id="counter">0</div>
+        <button class="counter-button" onclick="updateCounter(1)">+</button>
+        <button class="validate-button" onclick="validateCount()">✓</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        var socket = io();
+        
+        socket.on('reset_event', function() {
+            location.reload();  // Rafraîchit la page
+        });
+
+        const generateBtn = document.getElementById('generateBtn');
+        const loading = document.getElementById('loading');
+        const audio = document.getElementById('audio');
+
+        generateBtn.addEventListener('click', async () => {
+            if (audio.paused) {  // Vérifie si l'audio n'est pas en cours de lecture
+                try {
+                    generateBtn.disabled = true;
+                    loading.style.display = 'block';
+
+                    const response = await fetch('/generate', {
+                        method: 'POST'
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        audio.src = data.audio_path;
+                        audio.play();
+                        generateBtn.classList.add('playing');  // Ajoute la classe playing
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                } finally {
+                    loading.style.display = 'none';
+                }
+            }
+        });
+
+        // Réactive le bouton quand l'audio est terminé
+        audio.addEventListener('ended', () => {
+            generateBtn.disabled = false;
+            generateBtn.classList.remove('playing');  // Retire la classe playing
+        });
+
+        let count = 0;
+        
+        function updateCounter(value) {
+            count = Math.max(0, count + value);  // Empêche les nombres négatifs
+            document.getElementById('counter').textContent = count;
+        }
+
+        let isSystemLocked = false;
+        
+        async function validateCount() {
+            if (isSystemLocked) return;
+            
+            try {
+                const response = await fetch('/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ count: count })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Afficher 4 en jaune
+                    document.getElementById('counter').textContent = "4";
+                    document.getElementById('counter').classList.add('success');
+                    // Désactiver les contrôles
+                    disableControls();
+                } else {
+                    // Bloquer le système pendant 10s
+                    lockSystem();
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        function lockSystem() {
+            isSystemLocked = true;
+            const radioSystem = document.getElementById('radioSystem');
+            const counterSystem = document.getElementById('counterSystem');
+            const errorMessage = document.getElementById('errorMessage');
+            const timerSpan = document.getElementById('timer');
+            
+            // Désactiver l'interface
+            radioSystem.classList.add('system-disabled');
+            counterSystem.classList.add('system-disabled');
+            errorMessage.style.display = 'block';
+            
+            // Timer de 10 secondes
+            let timeLeft = 10;
+            const timer = setInterval(() => {
+                timeLeft--;
+                timerSpan.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    unlockSystem();
+                }
+            }, 1000);
+        }
+
+        function unlockSystem() {
+            isSystemLocked = false;
+            const radioSystem = document.getElementById('radioSystem');
+            const counterSystem = document.getElementById('counterSystem');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Réactiver l'interface
+            radioSystem.classList.remove('system-disabled');
+            counterSystem.classList.remove('system-disabled');
+            errorMessage.style.display = 'none';
+        }
+
+        function disableControls() {
+            // Désactive les contrôles après succès
+            document.querySelectorAll('.counter-button, .validate-button').forEach(button => {
+                button.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
