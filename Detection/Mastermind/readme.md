@@ -1,4 +1,4 @@
-# Epreuve Megamind  
+# Epreuve Mastermind  
 
 ## Description 
 
@@ -12,6 +12,10 @@ python -m venv venv_vision2024
 source venv_vision2024/bin/activate
 #installation des requirements (à faire une fois avec le virtual env activé)
 pip install -r requirements.txt
+
+
+pip3 install paho-mqtt
+
 ```
 
 ### Prérequis

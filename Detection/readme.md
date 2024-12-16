@@ -17,4 +17,4 @@ Voir les étapes d'installation de l'épreuve associé:
 1. [Personnes](<./2 caméras/readme.md>)
 2. [Visages](./Visage/readme.md)
 3. [Emotions](./Emotions/readme.md)
-4. [Megamind](./Megamind/readme.md)
+4. [Mastermind](./Mastermind/readme.md)
