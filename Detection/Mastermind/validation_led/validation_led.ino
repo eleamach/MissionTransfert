@@ -122,10 +122,17 @@ void messageReceived(String &topic, String &payload) {
   Serial.print("Essais: ");
   Serial.println(essais);
 
-  tft.fillRect(0, 0, 240, 40, TFT_BLACK);
-  tft.setCursor(10, 20);  // Position du texte
-  tft.printf("%d", essais);
-
+  tft.fillScreen(TFT_BLACK); // Efface l'écran
+  tft.setCursor((tft.width() - 6 * 3 * 4) / 2, tft.height() / 2 - 30);
+  tft.setTextSize(3);
+  if(correcte == 4){
+    tft.setTextColor(TFT_PURPLE);
+    tft.printf("%s", "Bravo : 8");
+  }
+  else{
+    tft.setTextColor(TFT_WHITE);
+    tft.printf("%s", essais);
+  }
    // Faire clignoter les LEDs 3 fois
   blinkAllLeds(3, 300); // 3 clignotements avec 300ms d'intervalle
 
@@ -133,8 +140,6 @@ void messageReceived(String &topic, String &payload) {
   lightUpRedLeds(malPlace);
   lightUpGreenLeds(correcte);
 }
-
-
 
 
 void setup() {
@@ -171,11 +176,10 @@ void setup() {
   digitalWrite(ledGreenPin4, LOW);
 
   tft.init();  // Initialiser l'écran
-  delay(1000);
-  tft.setRotation(2);  // Orientation de l'écran
+  tft.setRotation(0);  // Orientation de l'écran
   tft.fillScreen(TFT_BLACK);  // Efface l'écran avec du noir
   tft.setTextColor(TFT_WHITE, TFT_BLACK);  // Couleur du texte (blanc sur noir)
-  tft.setTextSize(2);  // Taille du texte
+  // tft.setTextSize(2);  // Taille du texte
   delay(1000);
 }
 

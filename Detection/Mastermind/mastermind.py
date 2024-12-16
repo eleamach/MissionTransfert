@@ -5,10 +5,61 @@ import numpy as np
 import time 
 import random
 
+import importlib
+import mqtt_message
+importlib.reload(mqtt_message)
+
 from mqtt_message import start_mqtt_service
 
 # For OpenCV2 image display
 WINDOW_NAME = 'Mastermind'
+
+class MastermindGame:
+    def __init__(self, all_colors):
+        self.all_colors = all_colors
+        self.essais = 0
+        self.essais_max = 15
+        self.goals = self.random_goal()
+        self.correcte = 0
+        self.malPlace = 0
+        self.backup_detected_colors = ['', '', '', '']
+        self.color_ranges = self.create_color_ranges()
+
+    def create_color_ranges(self):
+        """Créer un dictionnaire avec les plages de couleurs HSV pour chaque couleur."""
+        color_ranges = {}
+        for color in self.all_colors:
+            lower_color, upper_color = color_name_to_color_code(color)
+            if lower_color is not None and upper_color is not None:
+                color_ranges[color] = (lower_color, upper_color)
+        return color_ranges
+
+    def random_goal(self):
+        """Génère un nouvel objectif aléatoire de 4 couleurs."""
+        new_goals = random.sample(self.all_colors, 4)
+        print(f"Nouvel objectif : {new_goals}")
+        return new_goals
+
+    def reset_game(self):
+        """Réinitialise le jeu."""
+        self.essais = 0
+        self.correcte = 0
+        self.malPlace = 0
+        self.goals = self.random_goal()
+        print("Jeu réinitialisé.")
+        data = {'correcte': 0, 'mal_place': 0, 'essais' : ""}
+        mqtt_service.publish(data, "/detection/mastermind/led")
+
+    def update_results(self, detected_colors):
+        """Met à jour les résultats après chaque essai."""
+        self.correcte = 0
+        self.malPlace = 0
+        for index, goal in enumerate(self.goals):
+            if goal == detected_colors[index]:
+                self.correcte += 1
+            elif goal in detected_colors:
+                self.malPlace += 1
+        print(f"Correcte : {self.correcte} Mal placé : {self.malPlace}")
 
 
 def track(image, color_ranges, rois):
@@ -58,7 +109,10 @@ def track(image, color_ranges, rois):
 
     return detected_colors
 
-
+def cmd_receive(cmd, game):
+    if cmd == "reset":
+        game.reset_game()
+    
 def color_name_to_color_code(valeur):
     if valeur == 'vert_clair':
         return np.array([50, 50, 150]), np.array([70, 255, 255]) # Vert clair
@@ -78,41 +132,17 @@ def color_name_to_color_code(valeur):
         print('Couleur mal orthographiée ou non prise en compte')
         return None, None
 
-def random_goal(all_colors):
-    # Choisir aléatoirement 4 couleurs parmi les couleurs possibles sans répétition
-    new_goals = random.sample(all_colors, 4)
-    
-    # Afficher les nouveaux objectifs générés
-    print(f"Nouvel objectif : {new_goals}")
-    
-    return new_goals
 
 
 if __name__ == '__main__':
-    # Liste des couleurs à détecter
     all_colors = ['vert_clair', 'bleu_clair', 'violet', 'rouge', 'rose', 'jaune']
 
-    goals = random_goal(all_colors)
-    print(goals)
-    correcte = 0
-    malPlace = 0
-    essais = 0
-    essais_max = 15
-
-    backup_detected_colors = ['','','','']
-
-    # Création d'un dictionnaire avec les plages de couleurs HSV
-    color_ranges = {}
-    for color in all_colors:
-        lower_color, upper_color = color_name_to_color_code(color)
-        if lower_color is not None and upper_color is not None:
-            color_ranges[color] = (lower_color, upper_color)
-
-    # Démarre le service MQTT en parallèle
-    mqtt_service = start_mqtt_service()
+    # Crée une instance du jeu
+    game = MastermindGame(all_colors)
+    mqtt_service = start_mqtt_service(on_cmd_receive=lambda cmd: cmd_receive(cmd, game))
 
     # Capture du flux vidéo (0 pour /dev/video0)
-    capture = cv2.VideoCapture(0, cv2.CAP_V4L2)  # Vous pouvez essayer cv2.CAP_V4L2 pour forcer V4L2
+    capture = cv2.VideoCapture(1, cv2.CAP_V4L2)  # Vous pouvez essayer cv2.CAP_V4L2 pour forcer V4L2
 
     if not capture.isOpened():
         print("Erreur : Impossible d'accéder à la caméra.")
@@ -136,36 +166,29 @@ if __name__ == '__main__':
             print("Erreur : Impossible de lire le flux de la caméra.")
             continue
 
-        detected_colors = track(image, color_ranges, rois)
+        detected_colors = track(image, game.color_ranges, rois)
 
         # Affiche les couleurs détectées toutes les 0,5 secondes
         current_time = time.time()
         if current_time - start_time >= 0.5:
-            print(f"Couleurs détectées : {detected_colors}")
             if all(color is not None for color in detected_colors):
-                if backup_detected_colors != detected_colors:
+                if game.backup_detected_colors != detected_colors:
                     print(f"Couleurs détectées : {detected_colors}")
-                    backup_detected_colors = detected_colors
-                    essais += 1
-                    print(f"Essais : {essais} / {essais_max}")
-                    for index, goal in enumerate(goals):
-                        if goal == detected_colors[index]:
-                            correcte += 1
-                        elif goal in detected_colors:
-                            malPlace +=1
+                    game.backup_detected_colors = detected_colors
+                    game.essais += 1
+                    print(f"Essais : {game.essais} / {game.essais_max}")
+                    game.update_results(detected_colors)
                     
-                    print(f"Correcte : {correcte} Mal placé : {malPlace}")
                     # Envoyer les résultats MQTT
-                    data = {'correcte': correcte, 'mal_place': malPlace, 'essais' : f"{essais}/{essais_max}"}
-                    mqtt_service.publish(data)
+                    data = {'correcte': game.correcte, 'mal_place': game.malPlace, 'essais' : f"{game.essais}/{game.essais_max}"}
+                    mqtt_service.publish(data, "/detection/mastermind/led")
                     
-                    if correcte == 4:
+                    if game.correcte == 4:
                         print("bravo !!!!")
-                    elif essais >= essais_max:
-                        goals = random_goal(all_colors)
-                        essais = 0
-                    correcte = 0
-                    malPlace = 0
+                        data = "finish"
+                        mqtt_service.publish(data, "/detection/masterming/status")
+                    elif game.essais >= game.essais_max:
+                        game.reset_game()
 
             start_time = current_time
             
