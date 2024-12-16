@@ -13,18 +13,18 @@ uint8_t blue[16] = {0};
 bool buttons[16] = {false};
 
 // Variables pour la gestion des séquences
-int currentSequenceSize = 1;          // Taille actuelle de la séquence
-int maxSequenceSize = 5;              // Taille maximale pour le niveau actuel
-int sequencePositions[8] = {0};       // Positions des LEDs pour la séquence (jusqu'à 8 LEDs)
-uint8_t sequenceColors[8][3] = {0};   // Couleurs associées à chaque position
-int currentStep = 0;                  // Étape actuelle de la séquence
-unsigned long lastUpdateTime = 0;     // Dernière mise à jour de la séquence
+int currentSequenceSize = 1;           // Taille actuelle de la séquence
+int maxSequenceSize = 5;               // Taille maximale pour le niveau actuel
+int sequencePositions[10] = {0};       // Positions des LEDs pour la séquence (jusqu'à 10 LEDs)
+uint8_t sequenceColors[10][3] = {0};   // Couleurs associées à chaque position
+int currentStep = 0;                   // Étape actuelle de la séquence
+unsigned long lastUpdateTime = 0;      // Dernière mise à jour de la séquence
 const unsigned long updateInterval = 500; // Intervalle entre chaque étape (en ms)
-bool sequenceActive = true;           // Indique si une séquence est en cours
-bool userInputMode = false;           // Mode utilisateur actif
-int userInputIndex = 0;               // Index de l'étape utilisateur en cours
-bool levelComplete = false;           // Indique si le niveau est terminé
-int currentLevel = 1;                 // Niveau actuel
+bool sequenceActive = true;            // Indique si une séquence est en cours
+bool userInputMode = false;            // Mode utilisateur actif
+int userInputIndex = 0;                // Index de l'étape utilisateur en cours
+bool levelComplete = false;            // Indique si le niveau est terminé
+int currentLevel = 1;                  // Niveau actuel
 
 // Initialisation des broches SPI
 void setupSPI() {
@@ -90,11 +90,10 @@ void blackout() {
   commit();
 }
 
-// Génère une séquence aléatoire (les nouvelles étapes ajoutent une LED)
+// Génère une séquence aléatoire
 void generateSequence() {
   blackout();
   if (currentSequenceSize == 1) {
-    // Génère une séquence entière au début
     for (int i = 0; i < maxSequenceSize; i++) {
       sequencePositions[i] = random(16);
       int randomColorIndex = random(3);
@@ -156,10 +155,15 @@ void checkUserInput() {
           } else if (currentLevel == 1) {
             Serial.println("Niveau 1 terminé, passage au niveau 2 !");
             currentLevel = 2;
-            currentSequenceSize = 1; // Réinitialise à 1 LED
-            maxSequenceSize = 8;     // Passe à 8 LEDs
+            currentSequenceSize = 1;
+            maxSequenceSize = 8; // Niveau 2 : 8 LEDs
           } else if (currentLevel == 2) {
-            Serial.println("Niveau 2 terminé !");
+            Serial.println("Niveau 2 terminé, passage au niveau 3 !");
+            currentLevel = 3;
+            currentSequenceSize = 1;
+            maxSequenceSize = 10; // Niveau 3 : 10 LEDs
+          } else if (currentLevel == 3) {
+            Serial.println("Niveau 3 terminé !");
             levelComplete = true;
           }
           resetGame();
