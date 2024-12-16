@@ -1,4 +1,6 @@
 #include <SPI.h>
+#include <WiFi.h>
+#include <PubSubClient.h>
 
 // Configuration des broches
 #define PIN_SCK  21
@@ -30,6 +32,16 @@ bool userInputMode = false;            // Mode utilisateur actif
 int userInputIndex = 0;                // Index de l'étape utilisateur en cours
 bool levelComplete = false;            // Indique si le niveau est terminé
 int currentLevel = 1;                  // Niveau actuel
+bool levelTransition = false; // Empêche la mise à jour multiple des niveaux
+
+// Informations Wi-Fi et MQTT
+const char* ssid = "RobotiqueCPE";
+const char* password = "AppareilLunaire:DauphinRadio";
+const char* mqtt_server = "134.214.51.148";
+const char* mqtt_topic = "capteur/simon/status";
+
+WiFiClient espClient;
+PubSubClient client(espClient);
 
 // Initialisation des broches SPI
 void setupSPI() {
@@ -41,6 +53,32 @@ void setupSPI() {
   digitalWrite(PIN_SCK, HIGH);
   digitalWrite(PIN_CS, HIGH);
   digitalWrite(PIN_MISO, LOW);
+}
+
+// Connexion Wi-Fi
+void setupWiFi() {
+  Serial.println("Connexion au Wi-Fi...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConnecté au Wi-Fi !");
+}
+
+// Connexion au broker MQTT
+void reconnectMQTT() {
+  while (!client.connected()) {
+    Serial.println("Connexion au broker MQTT...");
+    if (client.connect("SimonGameESP32")) { // ID unique pour le client
+      Serial.println("Connecté au broker MQTT !");
+    } else {
+      Serial.print("Échec, état MQTT : ");
+      Serial.print(client.state());
+      Serial.println(". Nouvelle tentative dans 5 secondes...");
+      delay(5000);
+    }
+  }
 }
 
 // Écriture d'une trame sur le bus SPI
@@ -95,11 +133,13 @@ void blackout() {
   commit();
 }
 
-// Contrôle des LEDs de progression
 void updateProgressionLEDs() {
   digitalWrite(PIN_LED1, currentLevel >= 2 ? HIGH : LOW);
   digitalWrite(PIN_LED2, currentLevel >= 3 ? HIGH : LOW);
   digitalWrite(PIN_LED3, levelComplete ? HIGH : LOW);
+
+  // Ajouter une pause pour stabiliser la transition
+  delay(200); // Délai en millisecondes
 }
 
 // Génère une séquence aléatoire
@@ -145,72 +185,89 @@ void checkUserInput() {
       blackout();
       delay(100);
       if (i == sequencePositions[userInputIndex]) {
+        // Bonne entrée : allume la LED correspondante
         red[i] = sequenceColors[userInputIndex][0];
         green[i] = sequenceColors[userInputIndex][1];
         blue[i] = sequenceColors[userInputIndex][2];
         commit();
         delay(300);
         userInputIndex++;
+
+        // Vérifie si l'étape courante est terminée
         if (userInputIndex >= currentSequenceSize) {
           Serial.println("Étape réussie !");
           for (int j = 0; j < 3; j++) {
             blackout();
-            memset(green, 255, sizeof(green));
+            memset(green, 255, sizeof(green)); // LEDs en vert (succès)
             commit();
             delay(200);
             blackout();
             commit();
             delay(200);
           }
+
+          // Progression dans la séquence ou niveau
           if (currentSequenceSize < maxSequenceSize) {
             currentSequenceSize++;
-          } else if (currentLevel == 1) {
-            Serial.println("Niveau 1 terminé !");
-            currentLevel = 2;
-            currentSequenceSize = 1;
-            maxSequenceSize = 8;
-          } else if (currentLevel == 2) {
-            Serial.println("Niveau 2 terminé !");
-            currentLevel = 3;
-            currentSequenceSize = 1;
-            maxSequenceSize = 10;
-          } else if (currentLevel == 3) {
-            Serial.println("Niveau 3 terminé !");
-            levelComplete = true;
+          } else if (!levelTransition) { // Vérifie que la transition n'a pas eu lieu
+            levelTransition = true; // Active le verrou pour empêcher plusieurs transitions
+            if (currentLevel == 1) {
+              Serial.println("Niveau 1 terminé !");
+              currentLevel = 2;
+              currentSequenceSize = 1;
+              maxSequenceSize = 8; // Configuration pour le niveau 2
+              updateProgressionLEDs();
+            } else if (currentLevel == 2) {
+              Serial.println("Niveau 2 terminé !");
+              currentLevel = 3;
+              currentSequenceSize = 1;
+              maxSequenceSize = 10; // Configuration pour le niveau 3
+              updateProgressionLEDs();
+            } else if (currentLevel == 3) {
+              Serial.println("Niveau 3 terminé !");
+              levelComplete = true;
+
+              // Publie un message MQTT pour signaler la fin du jeu
+              client.publish(mqtt_topic, "finish");
+              updateProgressionLEDs();
+            }
           }
-          updateProgressionLEDs();
-          if (levelComplete) return;  // Ne pas réinitialiser après le niveau final
-          resetGame();
+          resetGame(); // Réinitialise pour le prochain niveau ou la prochaine séquence
         }
       } else {
+        // Mauvaise entrée : réinitialise la séquence courante
         Serial.println("Mauvaise touche !");
         for (int j = 0; j < 3; j++) {
           blackout();
-          memset(red, 255, sizeof(red));
+          memset(red, 255, sizeof(red)); // LEDs en rouge (échec)
           commit();
           delay(200);
           blackout();
           commit();
           delay(200);
         }
-        resetGame();
+        resetGame(); // Réinitialise la séquence
       }
     }
   }
 }
 
-// Réinitialise le jeu
 void resetGame() {
   userInputMode = false;
   sequenceActive = true;
   userInputIndex = 0;
   currentStep = 0;
+  levelTransition = false; // Réinitialise le verrou pour permettre une nouvelle progression
   generateSequence();
 }
 
 void setup() {
   Serial.begin(115200);
   setupSPI();
+
+  // Configurer Wi-Fi et MQTT
+  setupWiFi();
+  client.setServer(mqtt_server, 1883);
 
   pinMode(PIN_LED1, OUTPUT);
   pinMode(PIN_LED2, OUTPUT);
@@ -226,6 +283,11 @@ void setup() {
 }
 
 void loop() {
+  if (!client.connected()) {
+    reconnectMQTT();
+  }
+  client.loop(); // Gestion des événements MQTT
+
   commit();
   if (sequenceActive && !levelComplete) {
     unsigned long currentTime = millis();
