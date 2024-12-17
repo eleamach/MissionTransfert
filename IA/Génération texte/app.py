@@ -24,7 +24,7 @@ CORRECT_COUNT = 5  # Le nombre correct de "robotique"
 def publish_mqtt_status():
     try:
         client_mqtt = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-        client_mqtt.connect("localhost", 1883, 60)
+        client_mqtt.connect("134.214.51.148", 1883, 60)
         client_mqtt.publish("ia/texte/status", "finish")
         client_mqtt.disconnect()
     except Exception as e:
@@ -83,7 +83,7 @@ def setup_mqtt_subscriber():
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.on_message = on_message
     try:
-        client.connect("localhost", 1883, 60)
+        client.connect("134.214.51.148", 1883, 60)
         client.subscribe("ia/texte/cmd")
         client.loop_start()
     except Exception as e:
