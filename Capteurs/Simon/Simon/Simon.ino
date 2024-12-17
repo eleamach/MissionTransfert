@@ -144,32 +144,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-// Fonction pour réinitialiser le jeu Simon à l'état initial
-void resetSystem() {
-  // Réinitialise les variables globales
-  currentSequenceSize = 1;
-  maxSequenceSize = 5;
-  currentStep = 0;
-  userInputIndex = 0;
-  sequenceActive = true;
-  userInputMode = false;
-  levelComplete = false;
-  levelTransition = false;
-  currentLevel = 1;
 
-  // Éteint les LEDs de progression
-  digitalWrite(PIN_LED1, LOW);
-  digitalWrite(PIN_LED2, LOW);
-  digitalWrite(PIN_LED3, LOW);
-
-  // Éteint toutes les LEDs du pad
-  blackout();
-
-  // Régénère une nouvelle séquence
-  generateSequence();
-
-  Serial.println("Système réinitialisé avec succès.");
-}
 
 // Écriture d'une trame sur le bus SPI
 void writeFrame(const uint8_t* frame) {
@@ -425,10 +400,9 @@ void checkUserInput() {
                 // Envoi MQTT pour signaler la fin
                 client.publish(mqtt_topic, "finish");
 
-                // Boucle infinie pour maintenir l'état final
-                while (true) {
-                  delay(1000);
-                }
+                // Active un état d'attente pour écouter les messages MQTT
+                levelComplete = true;
+                Serial.println("En attente de réinitialisation...");
               }
           }
           resetGame();
@@ -465,6 +439,39 @@ void resetGame() {
   generateSequence();
 }
 
+// Fonction pour réinitialiser le jeu Simon à l'état initial
+void resetSystem() {
+  // Réinitialise les variables globales
+  currentSequenceSize = 1;
+  maxSequenceSize = 5;
+  currentStep = 0;
+  userInputIndex = 0;
+  sequenceActive = true;
+  userInputMode = false;
+  levelComplete = false;
+  levelTransition = false;
+  currentLevel = 1;
+
+  // Éteint les LEDs de progression
+  digitalWrite(PIN_LED1, LOW);
+  digitalWrite(PIN_LED2, LOW);
+  digitalWrite(PIN_LED3, LOW);
+
+  // Éteint toutes les LEDs du pad
+  blackout();
+
+  if (client.publish("/capteur/simon/status", "waiting")) {
+    Serial.println("Message 'waiting' envoyé avec succès.");
+  } else {
+    Serial.println("Échec de l'envoi du message 'waiting'.");
+  }
+
+  // Régénère une nouvelle séquence
+  generateSequence();
+
+  Serial.println("Système réinitialisé avec succès.");
+}
+
 void setup() {
   Serial.begin(115200);
   setupSPI();
@@ -499,6 +506,13 @@ void loop() {
     reconnectMQTT();
   }
   client.loop(); // Gestion des événements MQTT
+
+  if (levelComplete) {
+    // Maintient l'affichage du chiffre "1"
+    displayNumberOne();
+    delay(1000); // Réduit la charge CPU et stabilise l'affichage
+    return;      // Retourne directement pour éviter d'exécuter le reste du code
+  }
 
   commit();
   if (sequenceActive && !levelComplete) {
