@@ -68,7 +68,7 @@ bool levelTransition = false; // Empêche la mise à jour multiple des niveaux
 const char* ssid = "RobotiqueCPE";
 const char* password = "AppareilLunaire:DauphinRadio";
 const char* mqtt_server = "134.214.51.148";
-const char* mqtt_topic = "capteur/simon/status";
+const char* mqtt_topic = "/capteur/simon/status";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -109,14 +109,42 @@ void reconnectMQTT() {
     Serial.println("Connexion au broker MQTT...");
     if (client.connect("SimonGameESP32")) { // ID unique pour le client
       Serial.println("Connecté au broker MQTT !");
+      // Souscrit au topic après connexion
+      if (client.subscribe("/capteur/simon/cmd")) {
+        Serial.println("Souscription au topic /capteur/simon/cmd réussie.");
+      } else {
+        Serial.println("Erreur lors de la souscription au topic /capteur/simon/cmd.");
+      }
     } else {
-      Serial.print("Échec, état MQTT : ");
+      Serial.print("Échec de connexion, état MQTT : ");
       Serial.print(client.state());
       Serial.println(". Nouvelle tentative dans 5 secondes...");
       delay(5000);
     }
   }
 }
+
+// Fonction callback pour traiter les messages MQTT reçus
+void callback(char* topic, byte* payload, unsigned int length) {
+  String message;
+  
+  for (int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
+  
+  Serial.print("Message reçu sur le topic : ");
+  Serial.print(topic);
+  Serial.print(" -> ");
+  Serial.println(message);
+
+  // Vérifie si le message est "reset"
+  if (String(topic) == "/capteur/simon/cmd" && message == "reset") {
+    Serial.println("Commande RESET reçue. Réinitialisation en cours...");
+    resetSystem();
+  }
+}
+
+
 
 // Écriture d'une trame sur le bus SPI
 void writeFrame(const uint8_t* frame) {
@@ -145,9 +173,9 @@ void readFrame(uint8_t* frame) {
 void playNoteForButton(int buttonIndex) {
   if (buttonIndex >= 0 && buttonIndex < 16) {
     int note = buttonToNoteMap[buttonIndex];
-    tone(AudioPin, note, 300); // Joue la note pendant 300ms
-    delay(300);               // Pause pour la durée de la note
-    noTone(AudioPin);         // Arrête le son
+    tone(AudioPin, note, 100); // Joue la note pendant 300ms
+    delay(100);                // Pause pour la durée du son
+    noTone(AudioPin);          // Arrête le son
   }
 }
 
@@ -179,13 +207,30 @@ void blackout() {
   commit();
 }
 
+void showLevelCompleteLEDs(bool isSuccess) {
+  blackout(); // Éteint toutes les LEDs
+
+  if (isSuccess) {
+    // LEDs vertes pour succès
+    memset(green, 255, sizeof(green));
+  } else {
+    // LEDs rouges pour échec
+    memset(red, 255, sizeof(red));
+  }
+
+  commit();
+  delay(200); // Affiche pendant 300 ms
+  blackout(); // Éteint les LEDs après affichage
+  delay(200);
+}
+
 void updateProgressionLEDs() {
   digitalWrite(PIN_LED1, currentLevel >= 2 ? HIGH : LOW);
   digitalWrite(PIN_LED2, currentLevel >= 3 ? HIGH : LOW);
   digitalWrite(PIN_LED3, levelComplete ? HIGH : LOW);
 
   // Ajouter une pause pour stabiliser la transition
-  delay(200); // Délai en millisecondes
+  delay(100); // Délai en millisecondes
 }
 
 // Génère une séquence aléatoire
@@ -219,6 +264,7 @@ void generateSequence() {
 void processSequence() {
   if (currentStep < currentSequenceSize) {
     blackout();
+    delay(200);
     int position = sequencePositions[currentStep];
     red[position] = sequenceColors[currentStep][0];
     green[position] = sequenceColors[currentStep][1];
@@ -227,12 +273,11 @@ void processSequence() {
 
     // Jouer le son correspondant à la LED affichée
     int note = buttonToNoteMap[position]; // Récupère la note associée au bouton
-    tone(AudioPin, note, 300);         // Joue la note pendant 300ms
-    delay(300);                        // Pause pour la durée du son
-    noTone(AudioPin);                  // Arrête le son
+    tone(AudioPin, note, 100);            // Joue la note pendant 100ms
+    delay(50);                           // Pause pour la durée du son
+    noTone(AudioPin);                     // Arrête le son
 
     blackout();
-    delay(300); // Pause entre les étapes
     currentStep++;
   } else {
     currentStep = 0;
@@ -281,9 +326,17 @@ void playFailureMelody() {
 
 
 // Vérifie les entrées utilisateur
+unsigned long userInputLastTime = 0; // Stocke le temps du dernier appui utilisateur
+const unsigned long inputTimeout = 10000; // Délai d'attente en millisecondes (8 secondes)
+
 void checkUserInput() {
+  bool inputReceived = false; // Flag pour savoir si une touche est pressée
+
   for (int i = 0; i < 16; i++) {
     if (buttons[i]) {
+      inputReceived = true; // Une touche a été pressée
+      userInputLastTime = millis(); // Réinitialise le timer
+
       // Allume la lumière associée immédiatement
       red[i] = sequenceColors[userInputIndex][0];
       green[i] = sequenceColors[userInputIndex][1];
@@ -308,71 +361,74 @@ void checkUserInput() {
         // Vérifie si l'étape courante est terminée
         if (userInputIndex >= currentSequenceSize) {
           Serial.println("Étape réussie !");
-          for (int j = 0; j < 3; j++) {
-            blackout();
-            memset(green, 255, sizeof(green)); // LEDs en vert (succès)
-            commit();
-            delay(200);
-            blackout();
-            commit();
-            delay(200);
-          }
 
           // Progression dans la séquence ou niveau
           if (currentSequenceSize < maxSequenceSize) {
-            currentSequenceSize++;}
-          else if (!levelTransition) { // Vérifie que la transition n'a pas eu lieu
-            levelTransition = true; // Active le verrou pour empêcher plusieurs transitions
+            currentSequenceSize++;
+          } else 
+          if (!levelTransition) { 
+            levelTransition = true; 
             if (currentLevel == 1) {
               Serial.println("Niveau 1 terminé !");
               playSuccessMelody();
+              showLevelCompleteLEDs(true); // LEDs vertes
               currentLevel = 2;
               currentSequenceSize = 1;
-              maxSequenceSize = 8; // Configuration pour le niveau 2
+              maxSequenceSize = 8;
               updateProgressionLEDs();
             } else if (currentLevel == 2) {
               Serial.println("Niveau 2 terminé !");
               playSuccessMelody();
+              showLevelCompleteLEDs(true); // LEDs vertes
               currentLevel = 3;
               currentSequenceSize = 1;
-              maxSequenceSize = 10; // Configuration pour le niveau 3
+              maxSequenceSize = 10;
               updateProgressionLEDs();
             } else if (currentLevel == 3) {
                 Serial.println("Niveau 3 terminé !");
                 playSuccessMelody();
+                showLevelCompleteLEDs(true);
+
+                // Allume la 3ème LED pour indiquer la fin des 3 niveaux
+                digitalWrite(PIN_LED3, HIGH);
+
                 levelComplete = true;
 
-                // Affiche un chiffre "1" en blanc sur le pad pour toujours
+                // Affiche en permanence le chiffre "1" sur le pad
                 displayNumberOne();
 
-                // Publie un message MQTT pour signaler la fin du jeu
+                // Envoi MQTT pour signaler la fin
                 client.publish(mqtt_topic, "finish");
 
-                // Bloque toute nouvelle mise à jour du pad
-                while (true) {
-                  delay(1000); // Boucle infinie pour figer l'affichage
-                }
+                // Active un état d'attente pour écouter les messages MQTT
+                levelComplete = true;
+                Serial.println("En attente de réinitialisation...");
               }
           }
-          resetGame(); // Réinitialise pour le prochain niveau ou la prochaine séquence
+          resetGame();
         }
       } else {
         // Mauvaise entrée : réinitialise la séquence courante
         Serial.println("Mauvaise touche !");
-        blackout();
-        memset(red, 255, sizeof(red)); // LEDs en rouge (échec)
-        commit();
+        showLevelCompleteLEDs(false); // LEDs rouges pour échec
         playFailureMelody();
-        delay(200);
-        blackout();
-        commit();
-        
-        resetGame(); // Réinitialise la séquence
+        resetGame();
       }
-      break; // Sort de la boucle une fois le bouton traité
+      break; // Sort de la boucle après avoir traité la touche
     }
   }
+
+  // Réaffiche la séquence si aucune entrée n'est reçue dans le délai
+  if (!inputReceived && (millis() - userInputLastTime >= inputTimeout)) {
+    Serial.println("Aucune entrée détectée, réaffichage de la séquence !");
+    userInputLastTime = millis(); // Réinitialise le timer
+    currentStep = 0;              // Redémarre la séquence
+    sequenceActive = true;        // Passe en mode affichage de la séquence
+    userInputMode = false;        // Désactive le mode utilisateur
+  }
 }
+
+
 
 void resetGame() {
   userInputMode = false;
@@ -381,6 +437,39 @@ void resetGame() {
   currentStep = 0;
   levelTransition = false; // Réinitialise le verrou pour permettre une nouvelle progression
   generateSequence();
+}
+
+// Fonction pour réinitialiser le jeu Simon à l'état initial
+void resetSystem() {
+  // Réinitialise les variables globales
+  currentSequenceSize = 1;
+  maxSequenceSize = 5;
+  currentStep = 0;
+  userInputIndex = 0;
+  sequenceActive = true;
+  userInputMode = false;
+  levelComplete = false;
+  levelTransition = false;
+  currentLevel = 1;
+
+  // Éteint les LEDs de progression
+  digitalWrite(PIN_LED1, LOW);
+  digitalWrite(PIN_LED2, LOW);
+  digitalWrite(PIN_LED3, LOW);
+
+  // Éteint toutes les LEDs du pad
+  blackout();
+
+  if (client.publish("/capteur/simon/status", "waiting")) {
+    Serial.println("Message 'waiting' envoyé avec succès.");
+  } else {
+    Serial.println("Échec de l'envoi du message 'waiting'.");
+  }
+
+  // Régénère une nouvelle séquence
+  generateSequence();
+
+  Serial.println("Système réinitialisé avec succès.");
 }
 
 void setup() {
@@ -393,7 +482,12 @@ void setup() {
   // Configurer Wi-Fi et MQTT
   setupWiFi();
   client.setServer(mqtt_server, 1883);
+  client.setCallback(callback); // Associe la fonction callback
+  
+  // Connexion au broker MQTT (et souscription)
+  reconnectMQTT();
 
+  // Initialisation des LEDs
   pinMode(PIN_LED1, OUTPUT);
   pinMode(PIN_LED2, OUTPUT);
   pinMode(PIN_LED3, OUTPUT);
@@ -412,6 +506,13 @@ void loop() {
     reconnectMQTT();
   }
   client.loop(); // Gestion des événements MQTT
+
+  if (levelComplete) {
+    // Maintient l'affichage du chiffre "1"
+    displayNumberOne();
+    delay(1000); // Réduit la charge CPU et stabilise l'affichage
+    return;      // Retourne directement pour éviter d'exécuter le reste du code
+  }
 
   commit();
   if (sequenceActive && !levelComplete) {
