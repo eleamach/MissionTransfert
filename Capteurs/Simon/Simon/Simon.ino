@@ -191,13 +191,26 @@ void updateProgressionLEDs() {
 // Génère une séquence aléatoire
 void generateSequence() {
   blackout();
+  
+  // Liste des couleurs primaires et secondaires
+  const uint8_t colors[6][3] = {
+    {255, 0, 0},   // Rouge
+    {0, 255, 0},   // Vert
+    {0, 0, 255},   // Bleu
+    {0, 255, 255}, // Cyan
+    {255, 0, 255}, // Magenta
+    {255, 255, 0}  // Jaune
+  };
+
   if (currentSequenceSize == 1) {
     for (int i = 0; i < maxSequenceSize; i++) {
-      sequencePositions[i] = random(16);
-      int randomColorIndex = random(3);
-      sequenceColors[i][0] = (randomColorIndex == 0) ? 255 : 0;
-      sequenceColors[i][1] = (randomColorIndex == 1) ? 255 : 0;
-      sequenceColors[i][2] = (randomColorIndex == 2) ? 255 : 0;
+      sequencePositions[i] = random(16); // Position aléatoire sur le pad
+      int colorIndex = random(6);        // Index aléatoire pour choisir une couleur
+      
+      // Assigne les couleurs primaires/secondaires
+      sequenceColors[i][0] = colors[colorIndex][0]; // Rouge
+      sequenceColors[i][1] = colors[colorIndex][1]; // Vert
+      sequenceColors[i][2] = colors[colorIndex][2]; // Bleu
     }
   }
   Serial.println("Nouvelle étape ajoutée !");
@@ -227,6 +240,23 @@ void processSequence() {
     userInputMode = true;
     Serial.println("Reproduisez la séquence !");
   }
+}
+
+void displayNumberOne() {
+  // Éteint toutes les LEDs
+  blackout();
+
+  // Active les LEDs nécessaires pour afficher le chiffre "1" en blanc
+  red[1]  = 255; green[1]  = 255; blue[1]  = 0;  // Première ligne, deuxième colonne
+  red[5]  = 255; green[5]  = 255; blue[5]  = 0;  // Deuxième ligne, deuxième colonne
+  red[4]  = 255; green[4]  = 255; blue[4]  = 0;  // Deuxième ligne, première colonne
+  red[9]  = 255; green[9]  = 255; blue[9]  = 0;  // Troisième ligne, deuxième colonne
+  red[13] = 255; green[13] = 255; blue[13] = 0;  // Quatrième ligne, deuxième colonne
+  red[14] = 255; green[14] = 255; blue[14] = 0;  // Quatrième ligne, troisième colonne
+  red[12] = 255; green[12] = 255; blue[12] = 0;  // Quatrième ligne, première colonne
+
+  // Met à jour les LEDs
+  commit();
 }
 
 void playSuccessMelody() {
@@ -290,8 +320,8 @@ void checkUserInput() {
 
           // Progression dans la séquence ou niveau
           if (currentSequenceSize < maxSequenceSize) {
-            currentSequenceSize++;
-          } else if (!levelTransition) { // Vérifie que la transition n'a pas eu lieu
+            currentSequenceSize++;}
+          else if (!levelTransition) { // Vérifie que la transition n'a pas eu lieu
             levelTransition = true; // Active le verrou pour empêcher plusieurs transitions
             if (currentLevel == 1) {
               Serial.println("Niveau 1 terminé !");
@@ -308,14 +338,21 @@ void checkUserInput() {
               maxSequenceSize = 10; // Configuration pour le niveau 3
               updateProgressionLEDs();
             } else if (currentLevel == 3) {
-              Serial.println("Niveau 3 terminé !");
-              playSuccessMelody();
-              levelComplete = true;
+                Serial.println("Niveau 3 terminé !");
+                playSuccessMelody();
+                levelComplete = true;
 
-              // Publie un message MQTT pour signaler la fin du jeu
-              client.publish(mqtt_topic, "finish");
-              updateProgressionLEDs();
-            }
+                // Affiche un chiffre "1" en blanc sur le pad pour toujours
+                displayNumberOne();
+
+                // Publie un message MQTT pour signaler la fin du jeu
+                client.publish(mqtt_topic, "finish");
+
+                // Bloque toute nouvelle mise à jour du pad
+                while (true) {
+                  delay(1000); // Boucle infinie pour figer l'affichage
+                }
+              }
           }
           resetGame(); // Réinitialise pour le prochain niveau ou la prochaine séquence
         }
