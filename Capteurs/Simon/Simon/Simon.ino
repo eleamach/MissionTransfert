@@ -109,13 +109,66 @@ void reconnectMQTT() {
     Serial.println("Connexion au broker MQTT...");
     if (client.connect("SimonGameESP32")) { // ID unique pour le client
       Serial.println("Connecté au broker MQTT !");
+      // Souscrit au topic après connexion
+      if (client.subscribe("/capteur/simon/cmd")) {
+        Serial.println("Souscription au topic /capteur/simon/cmd réussie.");
+      } else {
+        Serial.println("Erreur lors de la souscription au topic /capteur/simon/cmd.");
+      }
     } else {
-      Serial.print("Échec, état MQTT : ");
+      Serial.print("Échec de connexion, état MQTT : ");
       Serial.print(client.state());
       Serial.println(". Nouvelle tentative dans 5 secondes...");
       delay(5000);
     }
   }
+}
+
+// Fonction callback pour traiter les messages MQTT reçus
+void callback(char* topic, byte* payload, unsigned int length) {
+  String message;
+  
+  for (int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
+  
+  Serial.print("Message reçu sur le topic : ");
+  Serial.print(topic);
+  Serial.print(" -> ");
+  Serial.println(message);
+
+  // Vérifie si le message est "reset"
+  if (String(topic) == "/capteur/simon/cmd" && message == "reset") {
+    Serial.println("Commande RESET reçue. Réinitialisation en cours...");
+    resetSystem();
+  }
+}
+
+// Fonction pour réinitialiser le jeu Simon à l'état initial
+void resetSystem() {
+  // Réinitialise les variables globales
+  currentSequenceSize = 1;
+  maxSequenceSize = 5;
+  currentStep = 0;
+  userInputIndex = 0;
+  sequenceActive = true;
+  userInputMode = false;
+  levelComplete = false;
+  levelTransition = false;
+  currentLevel = 1;
+
+  // Éteint les LEDs de progression
+  digitalWrite(PIN_LED1, LOW);
+  digitalWrite(PIN_LED2, LOW);
+  digitalWrite(PIN_LED3, LOW);
+
+  // Éteint toutes les LEDs du pad
+  blackout();
+
+  // Régénère une nouvelle séquence
+  generateSequence();
+
+  Serial.println("Système réinitialisé avec succès.");
 }
 
 // Écriture d'une trame sur le bus SPI
@@ -422,7 +475,12 @@ void setup() {
   // Configurer Wi-Fi et MQTT
   setupWiFi();
   client.setServer(mqtt_server, 1883);
+  client.setCallback(callback); // Associe la fonction callback
+  
+  // Connexion au broker MQTT (et souscription)
+  reconnectMQTT();
 
+  // Initialisation des LEDs
   pinMode(PIN_LED1, OUTPUT);
   pinMode(PIN_LED2, OUTPUT);
   pinMode(PIN_LED3, OUTPUT);
