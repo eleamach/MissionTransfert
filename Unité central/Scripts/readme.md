@@ -22,6 +22,9 @@ python game_master.py
 - `/ia/vocale/cmd` : Commandes pour le workshop vocale
 - `/ia/labyrinthe/cmd` : Commandes pour le workshop labyrinthe
 
+### Pepper
+- `/pepper/cmd` : Commandes pour pepper
+
 ## Topics de status
 
 ### Lot "capteur"
@@ -40,13 +43,25 @@ python game_master.py
 - `/ia/vocale/status` : État du workshop vocale
 - `/ia/labyrinthe/status` : État du workshop labyrinthe
 
+### Pepper 
+#### Pepper recoit 
+- `/pepper/capteur/status` : État du lot capteur
+- `/pepper/detection/status` : État du lot detection
+- `/pepper/ia/status` : État du lot ia
+#### pepper envoit 
+- `/pepper/capteur/valide` : État du lot capteur
+- `/pepper/detection/valide` : État du lot detection
+- `/pepper/ia/valide` : État du lot ia
+
 ## Topics du jeu
 - `/game/time` : Temps restant au format "MM:SS"
+- `/pepper/parole`: Faire parler pepper
 
 ## Valeurs possibles
 
 ### Commandes (cmd)
 - `reset` : Réinitialise le workshop
+- `start`: Pour lancer pepper
 
 ### Status
 - `waiting` : Workshop en attente
