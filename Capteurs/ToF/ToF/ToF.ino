@@ -103,4 +103,46 @@ void handleSensor(Adafruit_VL53L0X &lox, Adafruit_NeoPixel &strip, int ledIndex,
     calculateGradientColor(distance, targetDistance, includeFarBlue, red, green, blue);
     strip.setPixelColor(ledIndex, strip.Color(red, green, blue));
   } else {
-    Serial.print("Capte
+    Serial.print("Capteur ");
+    Serial.print(ledIndex + 1);
+    Serial.println(" : Hors de portée !");
+    strip.setPixelColor(ledIndex, strip.Color(255, 0, 0)); // Rouge intense
+  }
+
+  strip.show();
+}
+
+// Calculer la couleur dégradée
+void calculateGradientColor(float distance, float targetDistance, bool includeFarBlue, uint8_t &red, uint8_t &green, uint8_t &blue) {
+  float diff = fabs(distance - targetDistance);
+
+  if (diff <= GREEN_TOLERANCE) {
+    // Vert : distance correcte
+    red = 0;
+    green = 255;
+    blue = 0;
+  } else if (distance < targetDistance) {
+    // Dégradé bleu → violet → rose pour les distances inférieures
+    float normalizedDiff = (targetDistance - distance) / (targetDistance - TOF_MIN);
+    normalizedDiff = min(max(normalizedDiff, 0.0f), 1.0f);
+    blue = static_cast<uint8_t>(255 * (1.0f - normalizedDiff));
+    red = static_cast<uint8_t>(255 * normalizedDiff);
+    green = static_cast<uint8_t>((1.0f - normalizedDiff) * 127);
+  } else {
+    if (includeFarBlue) {
+      // Dégradé rose → bleu pour les distances supérieures
+      float normalizedDiff = (distance - targetDistance) / (TOF_MAX - targetDistance);
+      normalizedDiff = min(max(normalizedDiff, 0.0f), 1.0f);
+      blue = static_cast<uint8_t>(255 * normalizedDiff);
+      red = static_cast<uint8_t>(255 * (1.0f - normalizedDiff));
+      green = static_cast<uint8_t>((1.0f - normalizedDiff) * 127);
+    } else {
+      // Dégradé rose → rouge pour les distances supérieures
+      float normalizedDiff = (distance - targetDistance) / (TOF_MAX - targetDistance);
+      normalizedDiff = min(max(normalizedDiff, 0.0f), 1.0f);
+      red = 255;
+      blue = static_cast<uint8_t>(255 * (1.0f - normalizedDiff));
+      green = static_cast<uint8_t>((1.0f - normalizedDiff) * 127);
+    }
+  }
+}
