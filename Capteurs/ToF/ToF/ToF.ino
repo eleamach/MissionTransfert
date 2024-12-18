@@ -17,7 +17,7 @@ void setup() {
   Serial.begin(115200);
   Wire.begin(21, 22); // SDA = GPIO21, SCL = GPIO22
 
-  // Initialisation des GPIO XSHUT
+  // Initialisation des GPIO XSHUTs
   pinMode(XSHUT1, OUTPUT);
   pinMode(XSHUT2, OUTPUT);
   pinMode(XSHUT3, OUTPUT);
