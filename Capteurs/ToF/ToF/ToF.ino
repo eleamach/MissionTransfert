@@ -1,65 +1,53 @@
 #include <Wire.h>
 #include <Adafruit_VL53L0X.h>
+#include <Adafruit_NeoPixel.h>
 
-// Création des capteurs
+// Déclarations pour les capteurs ToF
 Adafruit_VL53L0X lox1 = Adafruit_VL53L0X();
 Adafruit_VL53L0X lox2 = Adafruit_VL53L0X();
-Adafruit_VL53L0X lox3 = Adafruit_VL53L0X();
-Adafruit_VL53L0X lox4 = Adafruit_VL53L0X();
 
-// Définition des broches XSHUT
+// Déclarations pour les LEDs RGB
+#define LED_PIN 8
+#define NUM_LEDS 2
+Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+// Broches XSHUT pour les capteurs
 #define XSHUT1 6
 #define XSHUT2 7
-#define XSHUT3 5
-#define XSHUT4 4
+
+// Plages de distance (en cm)
+#define TOF_MIN 2.0f            // Distance minimale mesurable
+#define TOF_MAX 120.0f          // Distance maximale mesurable
+#define TARGET_DISTANCE1 35.0f  // Distance cible pour le capteur 1
+#define TARGET_DISTANCE2 55.0f  // Distance cible pour le capteur 2
+
+// Tolérance pour le vert (distance cible atteinte)
+#define GREEN_TOLERANCE 0.5f
 
 void setup() {
   Serial.begin(115200);
   Wire.begin(21, 22); // SDA = GPIO21, SCL = GPIO22
 
-  // Initialisation des GPIO XSHUTs
+  // Initialisation des broches XSHUT
   pinMode(XSHUT1, OUTPUT);
   pinMode(XSHUT2, OUTPUT);
-  pinMode(XSHUT3, OUTPUT);
-  pinMode(XSHUT4, OUTPUT);
 
-  // Désactiver tous les capteurs au départ
+  // Désactiver les capteurs au départ
   digitalWrite(XSHUT1, LOW);
   digitalWrite(XSHUT2, LOW);
-  digitalWrite(XSHUT3, LOW);
-  digitalWrite(XSHUT4, LOW);
   delay(10);
 
-  // Initialisation des capteurs
-  if (initializeToF(XSHUT1, lox1, 0x30)) {
-    Serial.println("Capteur 1 initialisé à l'adresse 0x30");
-  } else {
-    Serial.println("Erreur : Capteur 1 non initialisé !");
-    while (1);
-  }
+  // Initialisation du capteur 1
+  if (!initializeToF(XSHUT1, lox1, 0x30)) while (1);
+  // Initialisation du capteur 2
+  if (!initializeToF(XSHUT2, lox2, 0x31)) while (1);
 
-  if (initializeToF(XSHUT2, lox2, 0x31)) {
-    Serial.println("Capteur 2 initialisé à l'adresse 0x31");
-  } else {
-    Serial.println("Erreur : Capteur 2 non initialisé !");
-    while (1);
-  }
+  // Initialisation des LEDs
+  strip.begin();
+  strip.setBrightness(20); // Luminosité réduite
+  strip.show();
 
-  if (initializeToF(XSHUT3, lox3, 0x32)) {
-    Serial.println("Capteur 3 initialisé à l'adresse 0x32");
-  } else {
-    Serial.println("Erreur : Capteur 3 non initialisé !");
-    while (1);
-  }
-
-  if (initializeToF(XSHUT4, lox4, 0x33)) {
-    Serial.println("Capteur 4 initialisé à l'adresse 0x33");
-  } else {
-    Serial.println("Erreur : Capteur 4 non initialisé !");
-    while (1);
-  }
-
-  Serial.println("Tous les capteurs sont prêts !");
+  Serial.println("Configuration terminée !");
 }
 
 bool initializeToF(int xshutPin, Adafruit_VL53L0X &lox, uint8_t newAddress) {
@@ -67,44 +55,73 @@ bool initializeToF(int xshutPin, Adafruit_VL53L0X &lox, uint8_t newAddress) {
   delay(10);
 
   if (!lox.begin(newAddress)) {
-    Serial.print("Erreur d'initialisation du capteur à l'adresse 0x");
+    Serial.print("Erreur : Capteur non initialisé à l'adresse 0x");
     Serial.println(newAddress, HEX);
     return false;
   }
+
+  Serial.print("Capteur initialisé à l'adresse 0x");
+  Serial.println(newAddress, HEX);
   return true;
 }
 
 void loop() {
-  VL53L0X_RangingMeasurementData_t measure;
+  // Lecture et gestion du capteur 1
+  handleSensor(lox1, 0, TARGET_DISTANCE1, true); // Bleu vers 120 cm pour capteur 1
+  // Lecture et gestion du capteur 2
+  handleSensor(lox2, 1, TARGET_DISTANCE2, true); // Bleu vers 120 cm pour capteur 2
 
-  // Lecture du capteur 1
-  lox1.rangingTest(&measure, false);
-  Serial.print("Capteur 1 (0x30) : ");
-  printDistance(measure);
-
-  // Lecture du capteur 2
-  lox2.rangingTest(&measure, false);
-  Serial.print("Capteur 2 (0x31) : ");
-  printDistance(measure);
-
-  // Lecture du capteur 3
-  lox3.rangingTest(&measure, false);
-  Serial.print("Capteur 3 (0x32) : ");
-  printDistance(measure);
-
-  // Lecture du capteur 4
-  lox4.rangingTest(&measure, false);
-  Serial.print("Capteur 4 (0x33) : ");
-  printDistance(measure);
-
-  delay(500); // Pause entre les lectures
+  delay(200);
 }
 
-void printDistance(VL53L0X_RangingMeasurementData_t measure) {
-  if (measure.RangeStatus != 4) { // 4 signifie hors de portée
-    Serial.print(measure.RangeMilliMeter / 10.0);
+// Gérer chaque capteur séparément
+void handleSensor(Adafruit_VL53L0X &lox, int ledIndex, float targetDistance, bool includeFarBlue) {
+  VL53L0X_RangingMeasurementData_t measure;
+  lox.rangingTest(&measure, false);
+
+  if (measure.RangeStatus != 4) {
+    float distance = measure.RangeMilliMeter / 10.0f; // Conversion en cm
+    Serial.print("Capteur ");
+    Serial.print(ledIndex + 1);
+    Serial.print(" : ");
+    Serial.print(distance);
     Serial.println(" cm");
+
+    uint8_t red = 0, green = 0, blue = 0;
+    calculateGradientColor(distance, targetDistance, includeFarBlue, red, green, blue);
+    strip.setPixelColor(ledIndex, strip.Color(red, green, blue));
   } else {
-    Serial.println("Hors de portée !");
+    Serial.print("Capteur ");
+    Serial.print(ledIndex + 1);
+    Serial.println(" : Hors de portée !");
+    strip.setPixelColor(ledIndex, strip.Color(255, 0, 0)); // Rouge intense
+  }
+
+  strip.show();
+}
+
+// Calculer la couleur dégradée
+void calculateGradientColor(float distance, float targetDistance, bool includeFarBlue, uint8_t &red, uint8_t &green, uint8_t &blue) {
+  float diff = fabs(distance - targetDistance);
+
+  if (diff <= GREEN_TOLERANCE) {
+    // Vert : distance correcte
+    red = 0;
+    green = 255;
+    blue = 0;
+  } else if (distance < targetDistance) {
+    // Dégradé bleu → violet → rose pour les distances inférieures
+    float normalizedDiff = (targetDistance - distance) / (targetDistance - TOF_MIN);
+    normalizedDiff = min(max(normalizedDiff, 0.0f), 1.0f);
+    blue = static_cast<uint8_t>(255 * (1.0f - normalizedDiff));
+    red = static_cast<uint8_t>(255 * normalizedDiff);
+    green = static_cast<uint8_t>((1.0f - normalizedDiff) * 127);
+  } else {
+    // Dégradé bleu → violet → rose pour les distances supérieures
+    float normalizedDiff = (distance - targetDistance) / (TOF_MAX - targetDistance);
+    normalizedDiff = min(max(normalizedDiff, 0.0f), 1.0f);
+    blue = static_cast<uint8_t>(255 * (1.0f - normalizedDiff));
+    red = static_cast<uint8_t>(255 * normalizedDiff);
+    green = static_cast<uint8_t>((1.0f - normalizedDiff) * 127);
   }
 }
