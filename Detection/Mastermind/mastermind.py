@@ -49,6 +49,7 @@ class MastermindGame:
         print("Jeu réinitialisé.")
         data = {'correcte': 0, 'mal_place': 0, 'essais' : ""}
         mqtt_service.publish(data, "/detection/mastermind/led")
+        mqtt_service.publish("waiting", "/detection/mastermind/status")
 
     def update_results(self, detected_colors):
         """Met à jour les résultats après chaque essai."""
@@ -142,7 +143,7 @@ if __name__ == '__main__':
     mqtt_service = start_mqtt_service(on_cmd_receive=lambda cmd: cmd_receive(cmd, game))
 
     # Capture du flux vidéo (0 pour /dev/video0)
-    capture = cv2.VideoCapture(1, cv2.CAP_V4L2)  # Vous pouvez essayer cv2.CAP_V4L2 pour forcer V4L2
+    capture = cv2.VideoCapture(0, cv2.CAP_V4L2)  # Vous pouvez essayer cv2.CAP_V4L2 pour forcer V4L2
 
     if not capture.isOpened():
         print("Erreur : Impossible d'accéder à la caméra.")
@@ -186,7 +187,7 @@ if __name__ == '__main__':
                     if game.correcte == 4:
                         print("bravo !!!!")
                         data = "finish"
-                        mqtt_service.publish(data, "/detection/masterming/status")
+                        mqtt_service.publish(data, "/detection/mastermind/status")
                     elif game.essais >= game.essais_max:
                         game.reset_game()
 

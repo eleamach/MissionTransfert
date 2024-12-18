@@ -123,13 +123,16 @@ void messageReceived(String &topic, String &payload) {
   Serial.println(essais);
 
   tft.fillScreen(TFT_BLACK); // Efface l'écran
-  tft.setCursor((tft.width() - 6 * 3 * 4) / 2, tft.height() / 2 - 30);
-  tft.setTextSize(3);
+  tft.setCursor((tft.width() - 6 * 3 * 4) / 2, tft.height() / 2 - 50);
   if(correcte == 4){
+    tft.setCursor((tft.width() - 6 * 7 * 1) / 2, tft.height() / 2 - 70);
+    tft.setTextSize(7);
     tft.setTextColor(TFT_PURPLE);
-    tft.printf("%s", "Bravo : 8");
+    tft.printf("%s", "8");
   }
   else{
+    tft.setCursor((tft.width() - 6 * 3 * 5) / 2, tft.height() / 2 - 50);
+    tft.setTextSize(3);
     tft.setTextColor(TFT_WHITE);
     tft.printf("%s", essais);
   }
