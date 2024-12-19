@@ -1,182 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pepper - Navigation</title>
     <script src="jquery-1.11.2.min.js"></script>
     <script src="/libs/qimessaging/1.0/qimessaging.js"></script>
-    <script src="script.js"></script> <!-- Inclusion du fichier JavaScript -->
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            height: 100vh;
-            font-family: 'Courier New', monospace;
-            background-color: #004aad;
-            color: white;
-            text-align: center;
-        }
-        header{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 10vh;
-            background-color: #004aad;
-            color: white;
-            font-size: 10vw;
-        }
-        .section {
-            display: none; /* Toutes les sections sont cachées par défaut */
-        }
-        .section.active {
-            display: flex; /* La section active est affichée */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-        }
-        .range {
-            position: relative;
-            background-color: #333;
-            width: 850px;
-            height: 40px;
-            border-radius: 40px;
-        }
-        .progress-bar {
-            height: 100%;
-            width: 0%; /* Par défaut, la barre est vide */
-            background-color: #88c4ff;
-            border-radius: 40px;
-            position: relative;
-        }
-        .percentage {
-            position: absolute;
-            left: 15px;
-            color: black;
-            font-weight: bold;
-            font-size: 35px;
-        }
-
-        #code-container {
-            display: flex;
-            justify-content: center;
-            gap: 30px; /* Espacement entre les chiffres */
-        }
-
-        .digit-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .digit-container button {
-            font-size: 4vw; /* Taille des boutons plus grande */
-            width: 80px;
-            height: 80px;
-            margin: 10px 0;
-            background-color: #ffffff;
-            color: #004aad;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .digit-container span {
-            font-size: 5vw; /* Chiffres plus grands */
-            margin: 10px 0;
-        }
-
-        button#validate-btn {
-            margin-top: 20px;
-            font-size: 2.5vw;
-            padding: 15px 30px;
-            background-color: #ffffff;
-            color: #004aad;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        button#validate-btn:hover {
-            background-color: #f0f0f0;
-            font-weight: bold;
-        }
-        #digit-0, #digit-1, #digit-2, #digit-3 {
-            font-size: 5vw;
-            font-weight: bold;
-            margin: 10px 0;
-            text-shadow: 2px 2px 4px rgb(0, 0, 0); /* Ajout d'une ombre portée */
-        }
-        #digit-0 {
-            color: rgb(235, 41, 218);
-        }
-        #digit-1 {
-            color: rgb(77, 255, 70);
-        }
-        #digit-2 {
-            color: rgb(67, 198, 231);
-        }
-        #digit-3 {
-            color: rgb(245, 194, 26);
-        }
-        #section_code .container {
-            display: flex; /* Place les éléments en ligne */
-            flex-direction: row; /* Les éléments s'alignent horizontalement */
-            align-items: center; /* Aligne verticalement les éléments au centre */
-            justify-content: center; /* Centre horizontalement les éléments */
-            gap: 30px; /* Ajoute un espacement entre l'image et le digicode */
-        }
-        
-        #section_code img {
-            width: 300px; /* Ajuste la taille de l'image si nécessaire */
-            height: auto;
-        }
-        
-        #clock {
-            font-size: 5vW;
-            font-weight: bold;
-            color: white;
-            font-family: 'Courier New', monospace;
-            position: absolute; /* Pour le positionner absolument */
-            top: 10px; /* À 10px du haut de l'écran */
-            left: 10px; /* À 10px du côté droit de l'écran */
-        }
-        
-        .custom-button {
-            font-size: 2vw; /* Taille similaire */
-            width: 180px; /* Largeur ajustée */
-            height: 50px; /* Hauteur ajustée */
-            margin: 10px 0;
-            background-color: #ffffff;
-            color: #004aad;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            position: absolute; /* Pour le positionner absolument */
-            top: 10px; /* À 10px du haut de l'écran */
-            right: 10px; /* À 10px du côté droit de l'écran */
-        }
-        
-        
-    </style>
+    <script src="script.js"></script> 
+    <link rel="stylesheet" href="assets.css"> 
 </head>
-<body>
 
-    <!-- Section Start --> 
+<body>
+    <!-- Page d'accueil -->
     <div id="section_start" class="section active">
         <img src="logobleu.jpg" alt="Image de Pepper" width="500" height="auto">
     </div>
 
-    <!-- Section Progress 0% -->
+    <!-- Page 0% -->
     <div id="section_0" class="section">
         <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto">
         <div class="range">
@@ -188,7 +29,7 @@
         <button class="custom-button">J'ai trouvé le code !</button>
     </div>
 
-    <!-- Section Progress 33% -->
+    <!-- Page 33% -->
     <div id="section_33" class="section">
         <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto">
         <div class="range">
@@ -200,7 +41,7 @@
         <button class="custom-button">J'ai trouvé le code !</button>
     </div>
 
-    <!-- Section Progress 66% -->
+    <!-- Page 66% -->
     <div id="section_66" class="section">
         <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto">
         <div class="range">
@@ -212,7 +53,7 @@
         <button class="custom-button">J'ai trouvé le code !</button>
     </div>
 
-    <!-- Section Progress 99% -->
+    <!-- Page 99% -->
     <div id="section_99" class="section">
         <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto">
         <div class="range">
@@ -224,7 +65,7 @@
         <button class="custom-button">J'ai trouvé le code !</button>
     </div>
 
-    <!-- Section Code -->
+    <!-- Page code -->
     <div id="section_code" class="section">
         <div class="container">
             <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto" style="margin-right: 20px;">
@@ -257,25 +98,27 @@
         <span id="clock">88:88</span>
     </div> 
     
-    <!-- Section final reussi-->
+    <!-- Page réussi -->
     <div id="section_final" class="section">
         <h1>Bravo !</h1>
         <div class="box"></div> 
     </div>
 
-    <!-- Section final perdu-->
+    <!-- Page perdu -->
     <div id="section_perdu" class="section">
         <img src="maitrepepper.jpeg" alt="Pepper qui fait de l'opéra">
         <div class="box"></div>
     </div>
+
     <script>
-        var capteurValidated = false;  // Variable de contrôle pour Capteur
-        var detectionValidated = false; // Variable de contrôle pour Détection
-        var iaValidated = false; // Variable de contrôle pour IA
-        var finalValidated = false; // Variable de contrôle pour Final
-    
-        //TODO:LOADJSON
+        // Variables pour la validation des codes
+        var capteurValidated = false;  
+        var detectionValidated = false; 
+        var iaValidated = false; 
+        var finalValidated = false; 
         var correctCodes = {};
+
+        // Load le json avec les codes  
         function loadjson() {
             $.getJSON("code.json", function (data) {
                 correctCodes = data;
@@ -283,66 +126,47 @@
             });
         }
 
-        // Fonction pour changer la valeur d'un chiffre
+        // Permet de changer les numéros du digicode
         function changeDigit(digitId, change) {
             var digitElement = document.getElementById(digitId);
             var currentDigit = parseInt(digitElement.textContent) || 0;
-    
-            // Modification du chiffre (0-9 cyclique)
             currentDigit += change;
             if (currentDigit > 9) currentDigit = 0; // Retour à 0 après 9
             if (currentDigit < 0) currentDigit = 9; // Retour à 9 avant 0
-    
             digitElement.textContent = currentDigit;
         }
     
+        // Permet de valider le code
         function validateCode() {
             var code = '';
             for (var i = 0; i < 4; i++) {
                 code += document.getElementById('digit-' + i).textContent;
             }
-        
-            code = code.trim();  // Retirer les espaces ou caractères invisibles
-        
-            // Afficher le code saisi pour le débogage
+            code = code.trim();  
             console.log("Code saisi :", code);
-        
-            // Vérifier si un code a déjà été validé
-            if (capteurValidated || detectionValidated || iaValidated || finalValidated) {
-                alert("Un code a déjà été validé, vous ne pouvez pas valider à nouveau.");
-                return; // Arrêter la fonction si un code a déjà été validé
-            }
-        
-            // Comparer avec les codes corrects
             if (code === correctCodes["Capteur"] && !capteurValidated) {
-                alert("Code correct pour Capteur !");
-                capteurValidated = true;  // Capteur est validé
-                raise("SimpleWeb/Page/CodeCorrectCapteur", true); // Soulever l'événement Capteur
+                alert("Code correct !");
+                capteurValidated = true;  
+                raise("SimpleWeb/Page/CodeCorrectCapteur", true); 
             } else if (code === correctCodes["Detection"] && capteurValidated && !detectionValidated) {
                 alert("Code correct pour Détection !");
-                detectionValidated = true;  // Détection est validée
-                raise("SimpleWeb/Page/CodeCorrectDetection", true); // Soulever l'événement Détection
+                detectionValidated = true;  
+                raise("SimpleWeb/Page/CodeCorrectDetection", true); 
             } else if (code === correctCodes["IA"] && capteurValidated && detectionValidated && !iaValidated) {
                 alert("Code correct pour IA !");
-                iaValidated = true;  // IA est validée
-                raise("SimpleWeb/Page/CodeCorrectIA", true); // Soulever l'événement IA
+                iaValidated = true;  
+                raise("SimpleWeb/Page/CodeCorrectIA", true); 
             } else if (code === correctCodes["Final"] && capteurValidated && detectionValidated && iaValidated && !finalValidated) {
                 alert("Code correct pour Final !");
-                finalValidated = true;  // Final est validé
-                showFinalSuccess(); // Afficher le succès final
+                finalValidated = true;  
+                showFinalSuccess();
             } else {
                 alert("Code incorrect ou déjà validé. Réessayez.");
-                console.log("Codes disponibles : ", correctCodes);
-                raise("SimpleWeb/Page/Final", true); // Soulever l'événement IA
-                // Vous pouvez également raise un événement pour gérer les erreurs si nécessaire
+                raise("SimpleWeb/Page/Final", true);
             }
         }
-        
-        
-    
-        // Charger les codes JSON lorsque la page se charge
         loadjson();
+
     </script>
-    
 </body>
 </html>
