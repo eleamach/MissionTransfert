@@ -4,51 +4,52 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-// Déclarations pour les capteurs ToF
+// === Déclarations des capteurs ToF (Time-of-Flight) ===
 Adafruit_VL53L0X lox1 = Adafruit_VL53L0X();
 Adafruit_VL53L0X lox2 = Adafruit_VL53L0X();
 Adafruit_VL53L0X lox3 = Adafruit_VL53L0X();
 
-// Déclarations pour les LEDs RGB
-#define LED_PIN1 8
-#define LED_PIN2 10
-#define NUM_LEDS 2
+// === Déclarations des bandeaux LED RGB ===
+#define LED_PIN1 8    // Broche pour le premier bandeau
+#define LED_PIN2 10   // Broche pour le second bandeau
+#define NUM_LEDS 2    // Nombre de LEDs par bandeau
 Adafruit_NeoPixel strip1(NUM_LEDS, LED_PIN1, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel strip2(NUM_LEDS, LED_PIN2, NEO_GRB + NEO_KHZ800);
 
-// Broches XSHUT pour les capteurs
-#define XSHUT1 6
-#define XSHUT2 7
-#define XSHUT3 5
+// === Déclarations des broches XSHUT des capteurs ===
+#define XSHUT1 6  // Broche XSHUT pour le capteur 1
+#define XSHUT2 7  // Broche XSHUT pour le capteur 2
+#define XSHUT3 5  // Broche XSHUT pour le capteur 3
 
-// Plages de distance (en cm)
-#define TOF_MIN 2.0f
-#define TOF_MAX 120.0f
-#define TARGET_DISTANCE1 30.0f
-#define TARGET_DISTANCE2 30.0f
-#define TARGET_DISTANCE3 30.0f
-#define GREEN_TOLERANCE 4.0f
+// === Plages de distance et seuils ===
+#define TOF_MIN 2.0f             // Distance minimale détectable par les capteurs (en cm)
+#define TOF_MAX 120.0f           // Distance maximale détectable par les capteurs (en cm)
+#define TARGET_DISTANCE1 30.0f   // Distance cible pour le capteur 1
+#define TARGET_DISTANCE2 30.0f   // Distance cible pour le capteur 2
+#define TARGET_DISTANCE3 30.0f   // Distance cible pour le capteur 3
+#define GREEN_TOLERANCE 4.0f     // Tolérance pour le vert (distance idéale ± tolérance)
 
-// Variables pour les états des capteurs
-bool sensor1Green = false;
-bool sensor2Green = false;
-bool sensor3Green = false;
-bool finishSent = false;
+// === Variables d'état pour les capteurs ===
+bool sensor1Green = false;  // État du capteur 1 (vert atteint)
+bool sensor2Green = false;  // État du capteur 2 (vert atteint)
+bool sensor3Green = false;  // État du capteur 3 (vert atteint)
+bool finishSent = false;    // Indique si le message "finish" a déjà été envoyé
 
-// Informations Wi-Fi et MQTT
-const char* ssid = "RobotiqueCPE";
-const char* password = "AppareilLunaire:DauphinRadio";
-const char* mqtt_server = "10.50.127.10";
-const char* mqtt_topic = "/capteur/tof/status";
+// === Informations pour la connexion Wi-Fi et MQTT ===
+const char* ssid = "RobotiqueCPE";                // Nom du réseau Wi-Fi
+const char* password = "AppareilLunaire:DauphinRadio"; // Mot de passe Wi-Fi
+const char* mqtt_server = "10.50.127.10";         // Adresse du serveur MQTT
+const char* mqtt_topic = "/capteur/tof/status";   // Topic MQTT pour publier les messages
 WiFiClient espClient;
-PubSubClient client(espClient);
+PubSubClient client(espClient); // Client MQTT
 
-// Initialisation des capteurs ToF
+// === Initialisation des capteurs ToF ===
+// Initialise un capteur ToF en configurant son adresse I2C
 bool initializeToF(int xshutPin, Adafruit_VL53L0X &lox, uint8_t newAddress) {
-  digitalWrite(xshutPin, HIGH); // Activer le capteur
+  digitalWrite(xshutPin, HIGH); // Active le capteur
   delay(10);
 
-  if (!lox.begin(newAddress)) {
+  if (!lox.begin(newAddress)) { // Initialise avec une nouvelle adresse I2C
     Serial.print("Erreur : Capteur non initialisé à l'adresse 0x");
     Serial.println(newAddress, HEX);
     return false;
@@ -59,10 +60,10 @@ bool initializeToF(int xshutPin, Adafruit_VL53L0X &lox, uint8_t newAddress) {
   return true;
 }
 
-// Configuration Wi-Fi
+// === Configuration du Wi-Fi ===
 void setupWiFi() {
   Serial.println("Connexion au Wi-Fi...");
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid, password); // Se connecte au réseau Wi-Fi
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -70,13 +71,13 @@ void setupWiFi() {
   Serial.println("\nConnecté au Wi-Fi !");
 }
 
-// Connexion MQTT
+// === Connexion au serveur MQTT ===
 void reconnectMQTT() {
   while (!client.connected()) {
     Serial.println("Connexion au broker MQTT...");
-    if (client.connect("ToFGameESP32")) {
+    if (client.connect("ToFGameESP32")) { // Identifiant unique du client
       Serial.println("Connecté au broker MQTT !");
-      if (client.subscribe("/capteur/tof/cmd")) {
+      if (client.subscribe("/capteur/tof/cmd")) { // Souscription au topic pour écouter les commandes
         Serial.println("Souscription au topic /capteur/tof/cmd réussie.");
       }
     } else {
@@ -88,7 +89,7 @@ void reconnectMQTT() {
   }
 }
 
-// Gestion des messages MQTT
+// === Gestion des messages MQTT ===
 void callback(char* topic, byte* payload, unsigned int length) {
   String message;
   for (int i = 0; i < length; i++) {
@@ -105,32 +106,32 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-// Réinitialisation de l'écran
+// === Réinitialisation de l'écran et des états ===
 void resetSystem() {
   Serial.println("Réinitialisation de l'écran...");
   if (client.publish(mqtt_topic, "screen_reset")) {
     Serial.println("Message 'screen_reset' envoyé avec succès.");
   }
-  finishSent = false; // Permet d'envoyer à nouveau "finish" après un reset
+  finishSent = false; // Autorise l'envoi d'un nouveau "finish"
 }
 
-// Gérer chaque capteur
+// === Gérer chaque capteur ToF ===
 bool handleSensor(Adafruit_VL53L0X &lox, Adafruit_NeoPixel &strip, int ledIndex, int sensorNumber, float targetDistance) {
   VL53L0X_RangingMeasurementData_t measure;
   lox.rangingTest(&measure, false);
 
-  if (measure.RangeStatus != 4) {
-    float distance = measure.RangeMilliMeter / 10.0f; // Conversion en cm
+  if (measure.RangeStatus != 4) { // Vérifie si la mesure est valide
+    float distance = measure.RangeMilliMeter / 10.0f; // Convertit en cm
     uint8_t red = 0, green = 0, blue = 0;
     calculateGradientColor(distance, targetDistance, red, green, blue);
     strip.setPixelColor(ledIndex, strip.Color(red, green, blue));
     strip.show();
 
-    // Affichage simple des distances
+    // Affiche les informations du capteur dans le Serial Monitor
     Serial.print("Capteur ");
     Serial.print(sensorNumber);
     Serial.print(" : Distance mesurée = ");
-    Serial.print(distance, 2); // Affiche avec deux décimales
+    Serial.print(distance, 2); // Deux décimales pour plus de précision
     Serial.print(" cm, Cible = ");
     Serial.print(targetDistance);
     Serial.println(" cm.");
@@ -147,21 +148,23 @@ bool handleSensor(Adafruit_VL53L0X &lox, Adafruit_NeoPixel &strip, int ledIndex,
   }
 }
 
-// Calculer la couleur dégradée
+// === Calcul de la couleur dégradée pour une distance mesurée ===
 void calculateGradientColor(float distance, float targetDistance, uint8_t &red, uint8_t &green, uint8_t &blue) {
   float diff = fabs(distance - targetDistance);
 
   if (diff <= GREEN_TOLERANCE) {
     red = 0;
     green = 255;
-    blue = 0;
+    blue = 0; // Vert si la distance est proche de la cible
   } else if (distance < targetDistance) {
+    // Dégradé bleu → violet → rose si distance inférieure à la cible
     float normalizedDiff = (targetDistance - distance) / (targetDistance - TOF_MIN);
     normalizedDiff = min(max(normalizedDiff, 0.0f), 1.0f);
     blue = static_cast<uint8_t>(255 * (1.0f - normalizedDiff));
     red = static_cast<uint8_t>(255 * normalizedDiff);
     green = static_cast<uint8_t>((1.0f - normalizedDiff) * 127);
   } else {
+    // Dégradé rose → rouge si distance supérieure à la cible
     float normalizedDiff = (distance - targetDistance) / (TOF_MAX - targetDistance);
     normalizedDiff = min(max(normalizedDiff, 0.0f), 1.0f);
     blue = static_cast<uint8_t>(255 * normalizedDiff);
@@ -170,7 +173,7 @@ void calculateGradientColor(float distance, float targetDistance, uint8_t &red, 
   }
 }
 
-// Configuration initiale
+// === Configuration initiale ===
 void setup() {
   Serial.begin(115200);
   Wire.begin(21, 22);
@@ -201,16 +204,16 @@ void setup() {
   reconnectMQTT();
 }
 
-// Boucle principale
+// === Boucle principale ===
 void loop() {
   if (!client.connected()) {
     reconnectMQTT();
   }
   client.loop();
 
-  sensor1Green = handleSensor(lox1, strip1, 0, 1, TARGET_DISTANCE1); // Capteur 1
-  sensor2Green = handleSensor(lox2, strip1, 1, 2, TARGET_DISTANCE2); // Capteur 2
-  sensor3Green = handleSensor(lox3, strip2, 0, 3, TARGET_DISTANCE3); // Capteur 3
+  sensor1Green = handleSensor(lox1, strip1, 0, 1, TARGET_DISTANCE1);
+  sensor2Green = handleSensor(lox2, strip1, 1, 2, TARGET_DISTANCE2);
+  sensor3Green = handleSensor(lox3, strip2, 0, 3, TARGET_DISTANCE3);
 
   if (sensor1Green && sensor2Green && sensor3Green) {
     if (!finishSent) {
@@ -220,5 +223,5 @@ void loop() {
     }
   }
 
-  delay(200);
+  delay(200); // Pause entre les cycles de lecture
 }

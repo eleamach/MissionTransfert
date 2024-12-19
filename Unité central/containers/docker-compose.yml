@@ -21,20 +21,3 @@ services:
       - /dev/ttyUSB0:/dev/ttyUSB0
     restart: unless-stopped
     privileged: true
-
-
-  mosquitto:
-    image: eclipse-mosquitto
-    container_name: mosquitto_broker
-    network_mode: host
-    environment:
-      - HOME
-    #user: 1000:1000
-    restart: always
-    # ports:
-    #   - "1883:1883"
-    #   - "9001:9001"
-    volumes:
-      - ${HOME}/docker_volumes/mosquitto/config:/mosquitto/config:rw
-      - ${HOME}/docker_volumes/mosquitto/data:/mosquitto/data:rw
-      - ${HOME}/docker_volumes/mosquitto/log:/mosquitto/log:rw  
