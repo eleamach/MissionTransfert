@@ -76,25 +76,23 @@ bool initializeToF(int xshutPin, Adafruit_VL53L0X &lox, uint8_t newAddress) {
 }
 
 void loop() {
-  Serial.println("Lecture des capteurs...");
-
   // Lecture et gestion des capteurs
-  handleSensor(lox1, strip1, 0, TARGET_DISTANCE1, true);  // Capteur 1 → Bandeau 1, LED 0
-  handleSensor(lox2, strip1, 1, TARGET_DISTANCE2, true); // Capteur 2 → Bandeau 1, LED 1
-  handleSensor(lox3, strip2, 0, TARGET_DISTANCE3, true); // Capteur 3 → Bandeau 2, LED 0
+  handleSensor(lox1, strip1, 0, 1, TARGET_DISTANCE1, true);  // Capteur 1 → Bandeau 1, LED 0
+  handleSensor(lox2, strip1, 1, 2, TARGET_DISTANCE2, true); // Capteur 2 → Bandeau 1, LED 1
+  handleSensor(lox3, strip2, 0, 3, TARGET_DISTANCE3, true); // Capteur 3 → Bandeau 2, LED 0
 
   delay(200);
 }
 
 // Gérer chaque capteur séparément
-void handleSensor(Adafruit_VL53L0X &lox, Adafruit_NeoPixel &strip, int ledIndex, float targetDistance, bool includeFarBlue) {
+void handleSensor(Adafruit_VL53L0X &lox, Adafruit_NeoPixel &strip, int ledIndex, int sensorNumber, float targetDistance, bool includeFarBlue) {
   VL53L0X_RangingMeasurementData_t measure;
   lox.rangingTest(&measure, false);
 
   if (measure.RangeStatus != 4) {
     float distance = measure.RangeMilliMeter / 10.0f; // Conversion en cm
     Serial.print("Capteur ");
-    Serial.print(ledIndex + 1);
+    Serial.print(sensorNumber);
     Serial.print(" : ");
     Serial.print(distance);
     Serial.println(" cm");
@@ -104,7 +102,7 @@ void handleSensor(Adafruit_VL53L0X &lox, Adafruit_NeoPixel &strip, int ledIndex,
     strip.setPixelColor(ledIndex, strip.Color(red, green, blue));
   } else {
     Serial.print("Capteur ");
-    Serial.print(ledIndex + 1);
+    Serial.print(sensorNumber);
     Serial.println(" : Hors de portée !");
     strip.setPixelColor(ledIndex, strip.Color(255, 0, 0)); // Rouge intense
   }
