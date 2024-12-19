@@ -18,7 +18,7 @@ class WorkshopStatus:
     simon: str = "waiting"
     tof: str = "waiting"
     bicamera: str = "waiting"
-    megaming: str = "waiting"
+    mastermind: str = "waiting"
     emotions: str = "waiting"
     photo: str = "waiting"
     texte: str = "waiting"
@@ -67,7 +67,7 @@ class GameMaster:
                     
             case GameState.PHASE_2:
                 if (self.workshop_status.bicamera == "finish" and 
-                    self.workshop_status.megaming == "finish" and 
+                    self.workshop_status.mastermind == "finish" and 
                     self.workshop_status.emotions == "finish" and 
                     self.workshop_status.photo == "finish"):
                     self.state = GameState.PHASE_3

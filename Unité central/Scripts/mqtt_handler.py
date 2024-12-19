@@ -3,39 +3,39 @@ from typing import Callable
 
 class MQTTHandler:
     # Command topics for "capteur" lot
-    TOPIC_BUTTON_CMD = "capteur/bouton/cmd"
-    TOPIC_SIMON_CMD = "capteur/simon/cmd"
-    TOPIC_TOF_CMD = "capteur/tof/cmd"
+    TOPIC_BUTTON_CMD = "/capteur/bouton/cmd"
+    TOPIC_SIMON_CMD = "/capteur/simon/cmd"
+    TOPIC_TOF_CMD = "/capteur/tof/cmd"
     
     # Command topics for "detection" lot
-    TOPIC_BICAMERA_CMD = "detection/bi-camera/cmd"
-    TOPIC_MASTERMIND_CMD = "detection/mastermind/cmd"
-    TOPIC_EMOTIONS_CMD = "detection/emotions/cmd"
-    TOPIC_PHOTO_CMD = "detection/photo/cmd"
+    TOPIC_BICAMERA_CMD = "/detection/bi-camera/cmd"
+    TOPIC_MASTERMIND_CMD = "/detection/mastermind/cmd"
+    TOPIC_EMOTIONS_CMD = "/detection/emotions/cmd"
+    TOPIC_PHOTO_CMD = "/detection/photo/cmd"
     
     # Command topics for "ia" lot
-    TOPIC_TEXTE_CMD = "ia/texte/cmd"
-    TOPIC_VOCALE_CMD = "ia/vocale/cmd"
-    TOPIC_LABYRINTHE_CMD = "ia/labyrinthe/cmd"
+    TOPIC_TEXTE_CMD = "/ia/texte/cmd"
+    TOPIC_VOCALE_CMD = "/ia/vocale/cmd"
+    TOPIC_LABYRINTHE_CMD = "/ia/labyrinthe/cmd"
     
     # Status topics for "capteur" lot
-    TOPIC_BUTTON_STATUS = "capteur/bouton/status"
-    TOPIC_SIMON_STATUS = "capteur/simon/status"
-    TOPIC_TOF_STATUS = "capteur/tof/status"
+    TOPIC_BUTTON_STATUS = "/capteur/bouton/status"
+    TOPIC_SIMON_STATUS = "/capteur/simon/status"
+    TOPIC_TOF_STATUS = "/capteur/tof/status"
     
     # Status topics for "detection" lot
-    TOPIC_BICAMERA_STATUS = "detection/bi-camera/status"
-    TOPIC_MASTERMIND_STATUS = "detection/mastermind/status"
-    TOPIC_EMOTIONS_STATUS = "detection/emotions/status"
-    TOPIC_PHOTO_STATUS = "detection/photo/status"
+    TOPIC_BICAMERA_STATUS = "/detection/bi-camera/status"
+    TOPIC_MASTERMIND_STATUS = "/detection/mastermind/status"
+    TOPIC_EMOTIONS_STATUS = "/detection/emotions/status"
+    TOPIC_PHOTO_STATUS = "/detection/photo/status"
     
     # Status topics for "ia" lot
-    TOPIC_TEXTE_STATUS = "ia/texte/status"
-    TOPIC_VOCALE_STATUS = "ia/vocale/status"
-    TOPIC_LABYRINTHE_STATUS = "ia/labyrinthe/status"
+    TOPIC_TEXTE_STATUS = "/ia/texte/status"
+    TOPIC_VOCALE_STATUS = "/ia/vocale/status"
+    TOPIC_LABYRINTHE_STATUS = "/ia/labyrinthe/status"
     
     # Game topic for clock
-    TOPIC_GAME_TIME = "game/time"
+    TOPIC_GAME_TIME = "/game/time"
 
     def __init__(self, message_callback: Callable):
         self.client = mqtt.Client()
