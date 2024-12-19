@@ -1,7 +1,18 @@
 {
-    "Atelier1" : [
-        "ceci est le premier indice de l'atelier 1",
-        "ceci est le deuxième indice de l'atelier 1",
-        "ceci est le troisième indice de l'atelier 1"
+    "Simon" : [
+        "Cet atelier est un Simon. Il consiste à répéter une séquence de couleurs de plus en plus longue.",
+        "Pour réussir, il faut bien observer la séquence de couleurs qui s'affiche et la reproduire en appuyant sur les boutons correspondants. Vous avez 3 niveaux de difficulté : facile, moyen et difficile.",
+        "Les leds vertes indiquent votre niveau actuel de difficulté. Le premier niveau est facile soit 5 boutons, le deuxième niveau est moyen soit 8 boutons et le troisième niveau est difficile avec 10 boutons"
+    ],
+    "Masterminde" : [
+        "Cet atelier est un Masterminde. Il consiste à trouver un code secret parmis les 6 couleurs disponible en un minimum de tentatives. Ici, 15 tantatives sont autorisées.",
+        "À chaque tentative, des leds vertes et rouges s'allument pour indiquer le nombre de couleurs bien placées ou mal placées. Vous pouvez voir sur l'ecran le nombre d'essai qu'il vous reste. Le code secret est généré aléatoirement à la fin de vos essais.",
+        "todo" 
+    ],
+    "Texte" : [
+        "Cette voix parle beaucoup mais répète souvent le même mot... C'est un peu lourd à la fin. Mais bon, c'est pas grave, on l'aime bien quand même. Enfin, on l'aime bien, c'est vite dit. En fait, on l'aime pas du tout. Mais bon, on fait avec. C'est la vie. ",
+        "Les details sont importants. Il faut bien observer ton environnement pour trouver la solution",
+        "Je crois avoir entendu la madame qui parle beaucoup dire plusieurs fois le mot robotique. Pas vous ?"
     ]
 }
+

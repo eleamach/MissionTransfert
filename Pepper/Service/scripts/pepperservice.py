@@ -8,23 +8,72 @@ class PepperService(object):
     APP_ID = "com.elea.pepperservice"
 
     def __init__(self, qiapp):
-        self.qiapp = qiapp
-        self.session = qiapp.session
-        self.tts = self.session.service("ALTextToSpeech")
-        self.tts.setLanguage("French")
-        self.audio_player = self.session.service("ALAudioPlayer")
-        self.logger = logging.getLogger(self.APP_ID)
-        logging.basicConfig(level=logging.INFO)
-        self.motion = self.session.service("ALMotion")
-        self.posture = self.session.service("ALRobotPosture")
-        self.animation_player = self.session.service("ALAnimationPlayer")
-        self.tts.setParameter("speed", 110)
-        self.tts.setParameter("pitchShift", 1.1)
-        self.memory = self.session.service("ALMemory")
-        self.active_subscriptions = set()  # Liste des abonnements actifs
+            self.qiapp = qiapp
+            self.session = qiapp.session
+            self.tts = self.session.service("ALTextToSpeech")
+            self.tts.setLanguage("French")
+            self.audio_player = self.session.service("ALAudioPlayer")
+            self.logger = logging.getLogger(self.APP_ID)
+            logging.basicConfig(level=logging.INFO)
+            self.motion = self.session.service("ALMotion")
+            self.posture = self.session.service("ALRobotPosture")
+            self.animation_player = self.session.service("ALAnimationPlayer")
+            self.tts.setParameter("speed", 110)
+            self.tts.setParameter("pitchShift", 1.1)
+            self.memory = self.session.service("ALMemory")
+            self.active_subscriptions = set()
+            self.head_touch_subscription = self.memory.subscriber("TouchChanged")
+            self.head_touch_subscription.signal.connect(self.on_touch_changed)
+            self.tablet = self.session.service("ALTabletService")
+            self.tablet.loadApplication("elea")
+            self.tablet.showWebview()
         
-        self.head_touch_subscription = self.memory.subscriber("TouchChanged")
-        self.head_touch_subscription.signal.connect(self.on_touch_changed)
+    @qi.bind(returnType=qi.Void, paramsType=[qi.String])
+    def play_animation(self, animation_name):
+        try:
+            self.animation_player.run(animation_name) 
+        except Exception as e:
+            self.logger.error("Erreur lors du lancement de l'animation : {}".format(e))
+            
+    @qi.bind(returnType=qi.Void, paramsType=[qi.String, qi.Int32])
+    def raise_event(self, event_name, value):
+        """
+        Cette méthode permet de lever un événement dans ALMemory.
+        :param event_name: Nom de l'événement.
+        :param value: Valeur associée à l'événement.
+        """
+        try:
+            self.memory.raiseEvent(event_name, value)
+            self.logger.info("Événement {} levé avec la valeur {}".format(event_name, value))
+        except Exception as e:
+            self.logger.error("Erreur lors de la levée de l'événement {}: {}".format(event_name, e))
+
+    @qi.bind(returnType=qi.Void, paramsType=[qi.String, qi.String, qi.String, qi.String, qi.String])
+    def speak_n_animate(self, id, datakey, animation, professors, maitre ):
+        try:
+            if professors:
+                self.tts.setParameter("speed", 110)
+                self.tts.setParameter("pitchShift", 0.9)
+            elif maitre:
+                self.tts.setParameter("speed", 90)
+                self.tts.setParameter("pitchShift", 0.8)
+            else:
+                self.tts.setParameter("speed", 110)
+                self.tts.setParameter("pitchShift", 1.1)
+            data = self.get_json("/home/elea.machillot/Documents/S1_G1_Machillot_Perbet_Jeannin_Delcamp/Pepper/Script/data.json")
+            self.play_animation(animation) 
+            self.tts.say(data[datakey][id])
+        except Exception as e:
+            print("Erreur lors de la parole ou de l'animation: {}".format(e))
+
+    @qi.bind(returnType=qi.Void, paramsType=[qi.String])
+    def play_music(self, file):        
+        try:
+            file_id = self.audio_player.loadFile(file)
+            self.audio_player.play(file_id)
+            self.running_audio_ids = [file_id]
+        except Exception as e:
+            self.logger.error("Error while playing music : {}".format(e))
     
     @qi.bind(returnType=qi.Void, paramsType=[qi.String])
     def subscribe(self, speech_recognition, module_name):
@@ -40,7 +89,6 @@ class PepperService(object):
 
     @qi.bind(returnType=qi.Void, paramsType=[qi.String])
     def unsubscribe(self, speech_recognition, module_name):
-        """Désabonne un module s'il est abonné."""
         if module_name in self.active_subscriptions:
             try:
                 speech_recognition.unsubscribe(module_name)
@@ -59,126 +107,98 @@ class PepperService(object):
                 sensor_name = touch[0]
                 is_touched = touch[1]
                 if sensor_name in ["Head/Touch/Front", "Head/Touch/Middle", "Head/Touch/Rear"] and is_touched:
-                    self.indice()
+                    try:
+                        self.tts.say("Un indice peut-être ?")
+                        speech_recognition = self.session.service("ALSpeechRecognition")
+                        vocabulary = ["oui", "non"]
+                        speech_recognition.pause(True)
+                        self.logger.info("Définition du vocabulaire : {}".format(vocabulary))
+                        speech_recognition.setVocabulary(vocabulary, False)
+                        speech_recognition.pause(False)
+                        memory = self.session.service("ALMemory")
+                        word_recognized_subscriber = memory.subscriber("WordRecognized")
+                        word_recognized_subscriber.signal.connect(self.on_word_recognized)
+                        self.logger.info("Signal connecté à on_word_recognized.")
+                        self.subscribe(speech_recognition, "IndiceDialog")
+                        time.sleep(10) 
+                    except Exception as e:
+                        self.logger.error("Erreur lors de l'indice : {}".format(e))
                     break
         except Exception as e:
             self.logger.error("Erreur lors du traitement des données tactiles : {}".format(e))
-
-    @qi.bind(returnType=qi.Void, paramsType=[])
-    def indice(self):
-        try:
-            self.tts.say("Un indice peut-être ?")
-            speech_recognition = self.session.service("ALSpeechRecognition")
-            vocabulary = ["oui", "non"]
-            speech_recognition.pause(True)
-            self.logger.info("Définition du vocabulaire : {}".format(vocabulary))
-            speech_recognition.setVocabulary(vocabulary, False)
-            speech_recognition.pause(False)
-
-            memory = self.session.service("ALMemory")
-            word_recognized_subscriber = memory.subscriber("WordRecognized")
-            word_recognized_subscriber.signal.connect(self.on_word_recognized)
-            self.logger.info("Signal connecté à on_word_recognized.")
-            self.subscribe(speech_recognition, "IndiceDialog")
-            
-            time.sleep(5)  # Donne du temps à l'utilisateur pour répondre
-        except Exception as e:
-            self.logger.error("Erreur lors de l'indice : {}".format(e))
 
     @qi.bind(returnType=qi.Void, paramsType=[qi.String])
     def on_word_recognized(self, data):
         try:
             word = data[0]
             confidence = data[1]            
-            if confidence > 0.4:
+            if confidence > 0.5:
                 if word == "oui":
-                    self.tts.say("D'accord, donnez-moi le nom de l'atelier.")
-                    self.ask_for_workshop()
+                    self.tts.say("A quel atelier etes-vous ? Si vous avez un doute sur le nom, regardez l'étiquette vers votre atelier") 
+                    try:
+                        speech_recognition = self.session.service("ALSpeechRecognition")
+                        speech_recognition.pause(True)
+                        workshops = ["Simon", "Masterminde", "Texte"] #TODO: modifier et ajouter les ateliers
+                        speech_recognition.setVocabulary(workshops, False)
+                        speech_recognition.pause(False)
+                        workshop_recognition_subscriber = self.memory.subscriber("WordRecognized")
+                        workshop_recognition_subscriber.signal.connect(self.on_workshop_recognized)
+                        self.subscribe(speech_recognition, "WorkshopDialog")
+                        time.sleep(10)  
+                    except Exception as e:
+                        self.logger.error("Erreur lors de la demande du nom de l'atelier : {}".format(e))
                 elif word == "non":
                     self.tts.say("Très bien, pas d'indice.")
         except Exception as e:
             self.logger.error("Erreur lors du traitement de la reconnaissance vocale : {}".format(e))
 
-    @qi.bind(returnType=qi.Void, paramsType=[])
-    def ask_for_workshop(self):
-        try:
-            self.tts.say("Quel est le nom de l'atelier ?")
-            speech_recognition = self.session.service("ALSpeechRecognition")
-            speech_recognition.pause(True)
-            workshops = ["Détéction", "Capteur", "IA"] 
-            speech_recognition.setVocabulary(workshops, False)
-            speech_recognition.pause(False)
-            workshop_recognition_subscriber = self.memory.subscriber("WordRecognized")
-            workshop_recognition_subscriber.signal.connect(self.on_workshop_recognized)
-            self.subscribe(speech_recognition, "WorkshopDialog")
-            time.sleep(5)
-        except Exception as e:
-            self.logger.error("Erreur lors de la demande du nom de l'atelier : {}".format(e))
-
     @qi.bind(returnType=qi.Void, paramsType=[qi.String])
     def on_workshop_recognized(self, data):
         try:
-            print("debug1")
-            workshop = data[0]  # Le nom de l'atelier reconnu
-            confidence = data[1]  # La confiance de la reconnaissance vocale
+            workshop = data[0]  
+            confidence = data[1] 
             speech_recognition = self.session.service("ALSpeechRecognition")
-            
-            if confidence > 0.4:
+            if confidence > 0.5:
                 self.tts.say("Vous avez choisi l'atelier {}. Voulez-vous le premier indice, le second indice ou la solution ?".format(workshop))
-                self.selected_workshop = workshop  # Sauvegarder l'atelier sélectionné
-                self.ask_for_hint()  # Demander l'indice
-            self.unsubscribe(speech_recognition, "WorkshopDialog")
-            
+                self.selected_workshop = workshop  
+                try:
+                    speech_recognition = self.session.service("ALSpeechRecognition")
+                    speech_recognition.pause(True)
+                    options = ["premier", "second", "solution"]  
+                    speech_recognition.setVocabulary(options, False)
+                    speech_recognition.pause(False)
+                    hint_recognition_subscriber = self.memory.subscriber("WordRecognized")
+                    hint_recognition_subscriber.signal.connect(self.on_hint_recognized)
+                    self.subscribe(speech_recognition, "HintDialog")
+                    time.sleep(10)  
+                except Exception as e:
+                    self.logger.error("Erreur lors de la demande du choix de l'indice : {}".format(e))
+                    self.unsubscribe(speech_recognition, "WorkshopDialog")
         except Exception as e:
             self.logger.error("Erreur lors de la reconnaissance du nom de l'atelier : {}".format(e))
-
-    @qi.bind(returnType=qi.Void, paramsType=[])
-    def ask_for_hint(self):
-        try:
-            self.tts.say("Voulez-vous le premier indice, le second indice, ou la solution ?")
-            speech_recognition = self.session.service("ALSpeechRecognition")
-            options = ["premier", "second", "solution"]  # Choix d'indice
-            speech_recognition.pause(True)
-            speech_recognition.setVocabulary(options, False)
-            speech_recognition.pause(False)
-            
-            # Abonnement pour écouter le choix de l'utilisateur concernant l'indice
-            memory = self.session.service("ALMemory")
-            hint_recognition_subscriber = memory.subscriber("WordRecognized")
-            hint_recognition_subscriber.signal.connect(self.on_hint_recognized)
-            self.subscribe(speech_recognition, "HintDialog")
-            
-        except Exception as e:
-            self.logger.error("Erreur lors de la demande du choix de l'indice : {}".format(e))
-
-
+    
     @qi.bind(returnType=qi.Void, paramsType=[qi.String])
     def on_hint_recognized(self, data):
         try:
-            choice = data[0]  # L'indice choisi
-            confidence = data[1]  # La confiance de la reconnaissance vocale
+            if data[0] == "premier":
+                self.hint = "0"
+            elif data[0] == "second":
+                self.hint = "1"
+            elif data[0] == "solution":
+                self.hint = "2" 
+            print("Hint {}".format(self.hint))
             speech_recognition = self.session.service("ALSpeechRecognition")
-            
-            if confidence > 0.4:
-                data = self.get_json("/path/to/your/json/file.json")  # Remplacez par le bon chemin
-                if choice == "premier indice":
-                    self.tts.say(data[self.selected_workshop][0])  # Affiche le premier indice
-                elif choice == "second indice":
-                    self.tts.say(data[self.selected_workshop][1])  # Affiche le second indice
-                elif choice == "solution":
-                    self.tts.say(data[self.selected_workshop][2])  # Affiche la solution
-            
-            # Désabonnement après la reconnaissance du choix
+            if data[1] > 0.5:  
+                if self.hint in ["0", "1", "2"]: 
+                    json_data = self.get_json("/home/elea.machillot/Documents/S1_G1_Machillot_Perbet_Jeannin_Delcamp/Pepper/Script/indice.json")
+                    self.tts.say(json_data[self.selected_workshop][int(self.hint)])
+                else:
+                    self.tts.say("Je n'ai pas compris votre choix.")
             self.unsubscribe(speech_recognition, "HintDialog")
-            self.tts.say("Vous avez choisi {}. Merci de votre participation.".format(choice))  # Correction ici
-
         except Exception as e:
             self.logger.error("Erreur lors de la reconnaissance du choix de l'indice : {}".format(e))
 
-
-
-
-    @qi.bind(returnType=qi.Void, paramsType=[qi.String])
+    @qi.bind(returnType=qi.Void, paramsType=[qi.String]) 
     def get_json(self, file):
         try:
             with open(file, "r") as f:
@@ -197,7 +217,6 @@ class PepperService(object):
             self.logger.error("Erreur lors de l'arrêt de l'application : {}".format(e))
 
     def cleanup_subscriptions(self):
-        """Désabonne tous les modules actifs."""
         speech_recognition = self.session.service("ALSpeechRecognition")
         for subscription in list(self.active_subscriptions):
             try:
