@@ -8,9 +8,9 @@ TFT_eSPI tft = TFT_eSPI();
 
 // Déclaration des broches où sont connectées les LEDs
 const int ledRedPin1 = 33; // LED sur la broche 7 ESP-C6
-const int ledRedPin2 = 25; // LED sur la broche 0 ESP-C6
+const int ledRedPin2 = 27; // LED sur la broche 0 ESP-C6
 const int ledRedPin3 = 26; // LED sur la broche 1 ESP-C6
-const int ledRedPin4 = 27; // LED sur la broche 8 ESP-C6
+const int ledRedPin4 = 25; // LED sur la broche 8 ESP-C6
 
 const int ledGreenPin1 = 2; // LED sur la broche 7 ESP-C6
 const int ledGreenPin2 = 15; // LED sur la broche 0 ESP-C6
@@ -123,15 +123,14 @@ void messageReceived(String &topic, String &payload) {
   Serial.println(essais);
 
   tft.fillScreen(TFT_BLACK); // Efface l'écran
-  tft.setCursor((tft.width() - 6 * 3 * 4) / 2, tft.height() / 2 - 50);
   if(correcte == 4){
-    tft.setCursor((tft.width() - 6 * 7 * 1) / 2, tft.height() / 2 - 70);
-    tft.setTextSize(7);
+    tft.setCursor((tft.width() - 6 * 6 * 1) / 2, tft.height() / 2 - 30);
+    tft.setTextSize(6);
     tft.setTextColor(TFT_PURPLE);
     tft.printf("%s", "8");
   }
   else{
-    tft.setCursor((tft.width() - 6 * 3 * 5) / 2, tft.height() / 2 - 50);
+    tft.setCursor((tft.width() - 6 * 3 * 5) / 2, tft.height() / 2 - 30);
     tft.setTextSize(3);
     tft.setTextColor(TFT_WHITE);
     tft.printf("%s", essais);
@@ -179,7 +178,7 @@ void setup() {
   digitalWrite(ledGreenPin4, LOW);
 
   tft.init();  // Initialiser l'écran
-  tft.setRotation(0);  // Orientation de l'écran
+  tft.setRotation(1);  // Orientation de l'écran
   tft.fillScreen(TFT_BLACK);  // Efface l'écran avec du noir
   tft.setTextColor(TFT_WHITE, TFT_BLACK);  // Couleur du texte (blanc sur noir)
   // tft.setTextSize(2);  // Taille du texte
