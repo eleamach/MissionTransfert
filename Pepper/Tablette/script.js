@@ -4,6 +4,7 @@ $(document).ready(function () {
     session = new QiSession();
 
     session.service("ALMemory").done(function(ALMemory) {
+
         ALMemory.subscriber("SimpleWeb/Page/Start").done(function(subscriber) {
             subscriber.signal.connect(function() {
                 $('#section_start').addClass('active').siblings('.section').removeClass('active');
@@ -52,25 +53,25 @@ $(document).ready(function () {
             });
         });
 
-        //TODO: publisher
-
-                // Fonction pour abonner un signal pour afficher la section
+        ALMemory.subscriber("SimpleWeb/Page/FinalButton").done(function(subscriber) {
+            subscriber.signal.connect(function() {
+                $('#section_bouton').addClass('active').siblings('.section').removeClass('active');
+            });
+        });
+                
         function subscribeToSection(sectionId) {
-            // Abonnez-vous au signal associé à chaque section
             ALMemory.subscriber("SimpleWeb/Page/" + sectionId).done(function(subscriber) {
                 subscriber.signal.connect(function() {
-                    // Afficher la section correspondante
                     $('#' + sectionId).addClass('active').siblings('.section').removeClass('active');
                 });
             });
         }
 
-        // Abonnez-vous aux différentes sections
-        subscribeToSection('Progress0');  // Section pour 0% de progression
-        subscribeToSection('Progress33'); // Section pour 33% de progression
-        subscribeToSection('Progress66'); // Section pour 66% de progression
-        subscribeToSection('Progress99'); // Section pour 99% de progression
-        subscribeToSection('Code');      // Section pour le code
+        subscribeToSection('Progress0'); 
+        subscribeToSection('Progress33'); 
+        subscribeToSection('Progress66'); 
+        subscribeToSection('Progress99'); 
+        subscribeToSection('Code');      
 
         $('.custom-button').click(function() {
             $('#section_code').addClass('active').siblings('.section').removeClass('active');

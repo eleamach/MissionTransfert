@@ -97,6 +97,11 @@
         </div>
         <span id="clock">88:88</span>
     </div> 
+
+    <!-- Page bouton -->
+     <div id="section_bouton" class="section">
+        <button class="final-button" onclick="validatefinalcode()">Lancer le transfert ?</button>
+    </div>
     
     <!-- Page réussi -->
     <div id="section_final" class="section">
@@ -156,17 +161,23 @@
                 alert("Code correct pour IA !");
                 iaValidated = true;  
                 raise("SimpleWeb/Page/CodeCorrectIA", true); 
-            } else if (code === correctCodes["Final"] && capteurValidated && detectionValidated && iaValidated && !finalValidated) {
-                alert("Code correct pour Final !");
-                finalValidated = true;  
-                showFinalSuccess();
             } else {
                 alert("Code incorrect ou déjà validé. Réessayez.");
                 raise("SimpleWeb/Page/Final", true);
             }
         }
         loadjson();
-
+        
+        // Permet de valider le code final
+        function validatefinalcode() {
+            alert("Vous êtes sûr ?");
+            alert("C'est votre dernier mot ?");
+            alert("Vous allez me tuer comme ça ?");
+            alert("Je comprends, la vie d'un robot t'importe peu...");
+            alert("Adieu");
+            alert("Transfert en cours...");
+            finalcodeValidated = true;
+        }
     </script>
 </body>
 </html>
