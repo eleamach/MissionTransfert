@@ -1,42 +1,42 @@
 #include <WiFi.h>
-#include <MQTT.h>
+#include <PubSubClient.h>
 
 // Informations WiFi et MQTT
-const char ssid[] = "RobotiqueCPE";
-const char pass[] = "AppareilLunaire:DauphinRadio";
-const char mqtt_server[] = "134.214.51.148";
+const char* ssid = "RobotiqueCPE";
+const char* password = "AppareilLunaire:DauphinRadio";
+const char* mqtt_server = "134.214.51.148";
+const char* topic = "/capteur/bouton/etat3"; // Topic unique pour ce bouton
 
 // Définition du bouton
-const int buttonPin = 20; // GPIO pour le bouton
-const char* topic = "button3"; // Topic pour publier l'état du bouton
+const int buttonPin = 21; // GPIO pour le bouton
+WiFiClient espClient;
+PubSubClient client(espClient);
 
-// Variables pour gérer les changements d'état
+// Variables pour gérer l'état du bouton
 bool previousState = HIGH;
 
-WiFiClient net;
-MQTTClient client;
-
 void connectMQTT() {
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(1000);
+  while (!client.connected()) {
+    if (client.connect("Bouton3")) {
+      Serial.println("Connecté au broker MQTT !");
+    } else {
+      Serial.print("Échec de connexion, état MQTT : ");
+      Serial.println(client.state());
+      delay(2000);
+    }
   }
-
-  while (!client.connect("ESP-Button3")) {
-    Serial.print(".");
-    delay(1000);
-  }
-
-  Serial.println("\nConnecté au broker MQTT.");
 }
 
 void setup() {
   Serial.begin(115200);
-  WiFi.begin(ssid, pass);
-  client.begin(mqtt_server, net);
+  WiFi.begin(ssid, password);
+  client.setServer(mqtt_server, 1883);
 
-  pinMode(buttonPin, INPUT_PULLUP); // Bouton avec résistance pull-up interne
-  connectMQTT();
+  pinMode(buttonPin, INPUT_PULLUP); // Résistance pull-up activée pour le bouton
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
 }
 
 void loop() {
@@ -50,7 +50,7 @@ void loop() {
     previousState = currentState;
 
     // Publier l'état du bouton
-    String message = (currentState == LOW) ? "appuye" : "relache";
+    String message = (currentState == LOW) ? "pressed" : "released";
     client.publish(topic, message.c_str());
 
     Serial.printf("Bouton 3 : %s\n", message.c_str());
