@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import qi
 from time import sleep
+from mqtt_message import start_mqtt_service  # Import de la fonction start_mqtt_service
 
-# Definition globales
+# Definitions globales
 IP = "10.50.90.104"
 PORT = 9559
 
@@ -15,11 +16,33 @@ def main():
         session = app.session
         pepper_service = session.service("PepperService")
         
-        # Lancement de l'application
-        pepper_service.raise_event("SimpleWeb/Page/Start", 1)
-        sleep(5)
+        # Initialisation du service MQTT avec la fonction callback pour les commandes reçues
+        is_started = False  # Variable pour vérifier si le message 'start' a été reçu
+        mqtt_service = start_mqtt_service(on_cmd_receive=lambda cmd: cmd_receive(cmd, pepper_service, is_started, mqtt_service))
+
+        # Boucle d'attente jusqu'à recevoir le message "start"
+        while not is_started:
+            sleep(1)  # Attente de 1 seconde entre les vérifications
+
+        # Après la réception du message "start", continuez avec la partie 1
+        print("Démarrage de la partie 1")
         partie_1(pepper_service)
-        sleep(5)
+        
+        # Publication d'un ensemble de message dès le dubut pour les initialiser
+        mqtt_service.publish("waiting", "/pepper/status")
+        mqtt_service.publish("false", "/pepper/capteur/valide")
+        mqtt_service.publish("false", "/pepper/detection/valide")
+        mqtt_service.publish("false", "/pepper/ia/valide")
+        
+        # Boucle d'attente pour recevoir les données des capteurs, de la détection et de l'IA
+        print("Capteur data:", mqtt_service.capteur_data)
+        print("Detection data:", mqtt_service.detection_data)
+        print("IA data:", mqtt_service.ia_data)
+        
+        """ 
+        pepper_service.raise_event("SimpleWeb/Page/Start", 1)
+        partie_1(pepper_service)
+        # DONE
         partie_2(pepper_service)
         sleep(5)
         partie_3(pepper_service)
@@ -28,22 +51,39 @@ def main():
         sleep(15)
         partie_5(pepper_service)
         sleep(5)
-        partie_6(pepper_service)
+        partie_6(pepper_service) 
+        """
         
+        # Arrêt du service MQTT après avoir envoyé les messages
+        mqtt_service.stop()
+
     except RuntimeError as e:
         print("Error: {}".format(e))
+
+def cmd_receive(cmd, pepper_service, is_started, mqtt_service):
+    """ Fonction appelée à la réception d'une commande """
+    if cmd == "start":
+        print("Commande 'start' reçue, lancement de partie_1")
+        mqtt_service.publish("In game", "/pepper/status")
+        is_started = True 
+        partie_1(pepper_service)
+        return is_started 
+    else:
+        print("Commande non reconnue")
+        return is_started
+
 
 # Partie 1 : Introduction
 def partie_1(pepper_service):
     pepper_service.play_music("/home/nao/.local/share/PackageManager/apps/elea/robot.mp3")
-    pepper_service.speak_n_animate(0, "intro","animations/Stand/BodyTalk/Listening/Listening_1", False, False)
+    """ pepper_service.speak_n_animate(0, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)
     pepper_service.speak_n_animate(1, "intro", "animations/Stand/Gestures/Hey_6", False, False)
     pepper_service.speak_n_animate(2, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)
     pepper_service.speak_n_animate(3, "intro", "animations/Stand/Reactions/TouchHead_4", False, False)
-    pepper_service.speak_n_animate(6, "intro", "animations/Stand/Emotions/Positive/Laugh_2", False, False) 
-    pepper_service.speak_n_animate(4, "intro","animations/Stand/BodyTalk/Listening/Listening_1", False, False) 
-    pepper_service.speak_n_animate(5, "intro","animations/Stand/BodyTalk/Listening/Listening_1", False, False)
-    pepper_service.raise_event("SimpleWeb/Page/Progress0", 1)
+    pepper_service.speak_n_animate(6, "intro", "animations/Stand/Emotions/Positive/Laugh_2", False, False)
+    pepper_service.speak_n_animate(4, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)
+    pepper_service.speak_n_animate(5, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)
+    pepper_service.raise_event("SimpleWeb/Page/Progress0", 1) """
     pepper_service.play_music("/home/nao/.local/share/PackageManager/apps/elea/clock.mp3")
 
 # Partie 2 : Premier lot "Capteurs"
