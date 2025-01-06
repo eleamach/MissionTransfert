@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pepper - Navigation</title>
+    <script src="jquery-1.11.2.min.js"></script>
+    <script src="/libs/qimessaging/1.0/qimessaging.js"></script>
+    <script src="script.js"></script> 
+    <link rel="stylesheet" href="assets.css"> 
+</head>
+
+<body>
+    <!-- Page d'accueil -->
+    <div id="section_start" class="section active">
+        <img src="logobleu.jpg" alt="Image de Pepper" width="500" height="auto">
+    </div>
+
+    <!-- Page 0% -->
+    <div id="section_0" class="section">
+        <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto">
+        <div class="range">
+            <div class="progress-bar" style="width: 0%;">
+                <span class="percentage">0%</span>
+            </div>
+        </div>
+        <span id="clock">88:88</span>
+        <button class="custom-button">J'ai trouvé le code !</button>
+    </div>
+
+    <!-- Page 33% -->
+    <div id="section_33" class="section">
+        <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto">
+        <div class="range">
+            <div class="progress-bar" style="width: 33%;">
+                <span class="percentage">33%</span>
+            </div>
+        </div>
+        <span id="clock">88:88</span>
+        <button class="custom-button">J'ai trouvé le code !</button>
+    </div>
+
+    <!-- Page 66% -->
+    <div id="section_66" class="section">
+        <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto">
+        <div class="range">
+            <div class="progress-bar" style="width: 66%;">
+                <span class="percentage">66%</span>
+            </div>
+        </div>
+        <span id="clock">88:88</span>
+        <button class="custom-button">J'ai trouvé le code !</button>
+    </div>
+
+    <!-- Page 99% -->
+    <div id="section_99" class="section">
+        <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto">
+        <div class="range">
+            <div class="progress-bar" style="width: 99%;">
+                <span class="percentage">99%</span>
+            </div>
+        </div>
+        <span id="clock">88:88</span>
+        <button class="custom-button">J'ai trouvé le code !</button>
+    </div>
+
+    <!-- Page code -->
+    <div id="section_code" class="section">
+        <div class="container">
+            <img src="logobleu.jpg" alt="Image de Pepper" width="350" height="auto" style="margin-right: 20px;">
+            <div>
+                <div id="code-container">
+                    <div class="digit-container">
+                        <button onclick="changeDigit('digit-0', 1)">+</button>
+                        <span id="digit-0">0</span>
+                        <button onclick="changeDigit('digit-0', -1)">-</button>
+                    </div>
+                    <div class="digit-container">
+                        <button onclick="changeDigit('digit-1', 1)">+</button>
+                        <span id="digit-1">0</span>
+                        <button onclick="changeDigit('digit-1', -1)">-</button>
+                    </div>
+                    <div class="digit-container">
+                        <button onclick="changeDigit('digit-2', 1)">+</button>
+                        <span id="digit-2">0</span>
+                        <button onclick="changeDigit('digit-2', -1)">-</button>
+                    </div>
+                    <div class="digit-container">
+                        <button onclick="changeDigit('digit-3', 1)">+</button>
+                        <span id="digit-3">0</span>
+                        <button onclick="changeDigit('digit-3', -1)">-</button>
+                    </div>
+                </div>
+                <button id="validate-btn" onclick="validateCode()">Valider</button>
+            </div>
+        </div>
+        <span id="clock">88:88</span>
+    </div> 
+
+    <!-- Page bouton -->
+     <div id="section_bouton" class="section">
+        <button class="final-button" onclick="validatefinalcode()">Lancer le transfert ?</button>
+    </div>
+    
+    <!-- Page réussi -->
+    <div id="section_final" class="section">
+        <h1>Bravo !</h1>
+        <div class="box"></div> 
+    </div>
+
+    <!-- Page perdu -->
+    <div id="section_perdu" class="section">
+        <img src="maitrepepper.jpeg" alt="Pepper qui fait de l'opéra">
+        <div class="box"></div>
+    </div>
+
+    <script>
+        // Variables pour la validation des codes
+        var capteurValidated = false;  
+        var detectionValidated = false; 
+        var iaValidated = false; 
+        var finalValidated = false; 
+        var correctCodes = {};
+
+        // Load le json avec les codes  
+        function loadjson() {
+            $.getJSON("code.json", function (data) {
+                correctCodes = data;
+                console.log("Codes chargés :", correctCodes);
+            });
+        }
+
+        // Permet de changer les numéros du digicode
+        function changeDigit(digitId, change) {
+            var digitElement = document.getElementById(digitId);
+            var currentDigit = parseInt(digitElement.textContent) || 0;
+            currentDigit += change;
+            if (currentDigit > 9) currentDigit = 0; // Retour à 0 après 9
+            if (currentDigit < 0) currentDigit = 9; // Retour à 9 avant 0
+            digitElement.textContent = currentDigit;
+        }
+    
+        // Permet de valider le code
+        function validateCode() {
+            var code = '';
+            for (var i = 0; i < 4; i++) {
+                code += document.getElementById('digit-' + i).textContent;
+            }
+            code = code.trim();  
+            console.log("Code saisi :", code);
+            if (code === correctCodes["Capteur"] && !capteurValidated) {
+                alert("Code correct !");
+                capteurValidated = true;  
+                raise("SimpleWeb/Page/CodeCorrectCapteur", true); 
+            } else if (code === correctCodes["Detection"] && capteurValidated && !detectionValidated) {
+                alert("Code correct pour Détection !");
+                detectionValidated = true;  
+                raise("SimpleWeb/Page/CodeCorrectDetection", true); 
+            } else if (code === correctCodes["IA"] && capteurValidated && detectionValidated && !iaValidated) {
+                alert("Code correct pour IA !");
+                iaValidated = true;  
+                raise("SimpleWeb/Page/CodeCorrectIA", true); 
+            } else {
+                alert("Code incorrect ou déjà validé. Réessayez.");
+                raise("SimpleWeb/Page/Final", true);
+            }
+        }
+        loadjson();
+        
+        // Permet de valider le code final
+        function validatefinalcode() {
+            alert("Vous êtes sûr ?");
+            alert("C'est votre dernier mot ?");
+            alert("Vous allez me tuer comme ça ?");
+            alert("Je comprends, la vie d'un robot t'importe peu...");
+            alert("Adieu");
+            alert("Transfert en cours...");
+            finalcodeValidated = true;
+        }
+    </script>
+</body>
+</html>
