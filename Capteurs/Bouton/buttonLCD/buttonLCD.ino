@@ -17,7 +17,7 @@ bool previousState = HIGH;
 
 void connectMQTT() {
   while (!client.connected()) {
-    if (client.connect("Bouton3")) {
+    if (client.connect("Bouton4")) {
       Serial.println("Connecté au broker MQTT !");
     } else {
       Serial.print("Échec de connexion, état MQTT : ");
