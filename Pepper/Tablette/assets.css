@@ -1,0 +1,159 @@
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    font-family: 'Courier New', monospace;
+    background-color: #004aad;
+    color: white;
+    text-align: center;
+}
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 10vh;
+    background-color: #004aad;
+    color: white;
+    font-size: 10vw;
+}
+.section {
+    display: none; /* Toutes les sections sont cachées par défaut */
+}
+.section.active {
+    display: flex; /* La section active est affichée */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+.range {
+    position: relative;
+    background-color: #333;
+    width: 850px;
+    height: 40px;
+    border-radius: 40px;
+}
+.progress-bar {
+    height: 100%;
+    width: 0%; /* Par défaut, la barre est vide */
+    background-color: #88c4ff;
+    border-radius: 40px;
+    position: relative;
+}
+.percentage {
+    position: absolute;
+    left: 15px;
+    color: black;
+    font-weight: bold;
+    font-size: 35px;
+}
+#code-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Espacement entre les chiffres */
+}
+.digit-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.digit-container button {
+    font-size: 4vw; /* Taille des boutons plus grande */
+    width: 80px;
+    height: 80px;
+    margin: 10px 0;
+    background-color: #ffffff;
+    color: #004aad;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+.digit-container span {
+    font-size: 5vw; /* Chiffres plus grands */
+    margin: 10px 0;
+}
+button#validate-btn {
+    margin-top: 20px;
+    font-size: 2.5vw;
+    padding: 15px 30px;
+    background-color: #ffffff;
+    color: #004aad;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+button#validate-btn:hover {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+#digit-0, #digit-1, #digit-2, #digit-3 {
+    font-size: 5vw;
+    font-weight: bold;
+    margin: 10px 0;
+    text-shadow: 2px 2px 4px rgb(0, 0, 0); /* Ajout d'une ombre portée */
+}
+#digit-0 {
+    color: rgb(235, 41, 218);
+}
+#digit-1 {
+    color: rgb(77, 255, 70);
+}
+#digit-2 {
+    color: rgb(67, 198, 231);
+}
+#digit-3 {
+    color: rgb(245, 194, 26);
+}
+#section_code .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+#section_code img {
+    width: 300px;
+    height: auto;
+}
+#clock {
+    font-size: 5vW;
+    font-weight: bold;
+    color: white;
+    font-family: 'Courier New', monospace;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+.custom-button {
+    font-size: 2vw;
+    width: 180px;
+    height: 50px;
+    margin: 10px 0;
+    background-color: #ffffff;
+    color: #004aad;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+.final-button {
+    font-size: 7vw;
+    width: 800px;
+    height: 200px;
+    background-color: #ffffff;
+    color: #004aad;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
