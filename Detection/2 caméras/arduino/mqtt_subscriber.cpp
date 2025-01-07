@@ -37,7 +37,7 @@ void reconnectMQTT() {
   while (!mqttClient.connected()) {
     Serial.print("[MQTT] Tentative de connexion...");
     // Si la connexion est un succès
-    if (mqttClient.connect("ESP32Client")) {
+    if (mqttClient.connect("ESP32Client_bi-cam2")) {
       Serial.println("connecté !");
       // On souscrit au topic souhaité
       mqttClient.subscribe(subscribe_topic);

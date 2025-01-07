@@ -130,5 +130,5 @@ void setup() {
 
 void loop() {
   handleMQTT();
-  delay(100);
+  delay(400);
 }
