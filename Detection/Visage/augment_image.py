@@ -18,10 +18,12 @@ datagen = ImageDataGenerator(
     zoom_range=0.2,
     brightness_range=[0.8, 1.2],
     horizontal_flip=True,
-    fill_mode='nearest'
+    fill_mode='constant',
+    cval=0  # Valeur de remplissage pour 'constant' (0 = noir)
 )
 
-# Parcourir chaque catégorie et appliquer les augmentations
+print("Début de l'augmentation des images...")
+
 for category in categories:
     input_dir = os.path.join(input_base_dir, category)
     output_dir = os.path.join(output_base_dir, category)
@@ -30,7 +32,9 @@ for category in categories:
     print(f"Traitement des images dans '{category}'...")
 
     for img_name in os.listdir(input_dir):
+        print(f"Chargement de l'image {img_name}...")  # Debug
         if not img_name.lower().endswith(('.png', '.jpg', '.jpeg')):
+            print(f"Fichier ignoré (non image) : {img_name}")
             continue
 
         img_path = os.path.join(input_dir, img_name)
@@ -48,8 +52,9 @@ for category in categories:
                                       save_to_dir=output_dir,
                                       save_prefix=f"{img_name.split('.')[0]}_aug",
                                       save_format='jpeg'):
+                print(f"Image augmentée générée : {i + 1} pour {img_name}")
                 i += 1
-                if i > 10:  # Générer 10 augmentations par image
+                if i > 2:  # 3 augmentations par image
                     break
         except Exception as e:
             print(f"Erreur avec l'image {img_name}: {e}")
