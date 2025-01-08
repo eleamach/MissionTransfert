@@ -3,161 +3,140 @@ import time
 import torch
 from ultralytics import YOLO
 import paho.mqtt.client as mqtt
-import threading
+from collections import deque
 
 # Configuration
-CAMERAS = {
-    "cam1": {
-        "url": "http://10.51.11.59:81/stream",
-        "target": 4,
-        "topic": "/detection/bi-camera/cam1-msg",
-        "window_name": "Camera 1"
-    },
-    "cam2": {
-        "url": "http://10.51.11.65:81/stream",
-        "target": 2,
-        "topic": "/detection/bi-camera/cam2-msg",
-        "window_name": "Camera 2"
-    }
-}
-
+ESP32_STREAM_URL = "http://10.51.11.59:81/stream"
 MQTT_BROKER = "134.214.51.148"
-CMD_TOPIC = "/detection/bi-camera/cmd"
+MQTT_TOPIC = "/detection/bi-camera/cam1-msg"
+MQTT_CMD_TOPIC = "/detection/bi-camera/cmd"
 
-# Variables globales pour le statut
-target_reached_time = {cam: 0 for cam in CAMERAS}
-success_state = False
-reset_lock = threading.Lock()
+DETECTION_TIME_THRESHOLD = 5.0  #La détection des personnes doit durer pendant 2 secondes avant validation
+
+# Variable globale pour le mode reset
+waiting_for_reset = False
 
 # Callbacks MQTT
-def on_connect(client, userdata, flags, reason_code, properties=None):
-    if reason_code == 0:
+def on_connect(client, userdata, flags, rc, properties=None):
+    if rc == 0:
         print("Connecté au broker MQTT")
-        client.subscribe(CMD_TOPIC)
+        client.subscribe(MQTT_CMD_TOPIC)
     else:
-        print(f"Échec de connexion au broker MQTT, code retour={reason_code}")
+        print(f"Échec de connexion au broker MQTT, code retour={rc}")
 
-def on_disconnect(client, userdata, rc):
+def on_disconnect(client, userdata, rc, properties=None):
     print("Déconnecté du broker MQTT")
 
-def on_message(client, userdata, msg):
-    global success_state
-    if msg.topic == CMD_TOPIC and msg.payload.decode() == "reset":
-        with reset_lock:
-            success_state = False
-            for cam in CAMERAS:
-                target_reached_time[cam] = 0
-        print("État réinitialisé")
+def on_message(client, userdata, message):
+    global waiting_for_reset
+    if message.topic == MQTT_CMD_TOPIC:
+        if message.payload.decode() == "reset":
+            waiting_for_reset = False
+            print("Reset reçu - reprise de la détection")
 
-def process_camera(cam_id, cam_config, model, client):
-    global success_state
-    
-    cap = cv2.VideoCapture(cam_config["url"])
+def main():
+    global waiting_for_reset
+    try:
+        client = mqtt.Client(protocol=mqtt.MQTTv5)
+        client.on_connect = on_connect
+        client.on_disconnect = on_disconnect
+        client.on_message = on_message
+        print("Tentative de connexion au broker MQTT...")
+        client.connect(MQTT_BROKER, 1883, keepalive=60)
+        client.loop_start()
+        client.subscribe(MQTT_CMD_TOPIC)
+    except Exception as e:
+        print(f"Erreur de connexion MQTT: {e}")
+        print("Continuation sans MQTT...")
+        client = None
+
+    cap = cv2.VideoCapture(ESP32_STREAM_URL)
+
     if not cap.isOpened():
-        print(f"Erreur : Impossible d'ouvrir le flux vidéo pour {cam_id}")
+        print("Erreur : Impossible d'ouvrir le flux vidéo")
+        if client:
+            client.loop_stop()
+            client.disconnect()
         return
 
-    cv2.namedWindow(cam_config["window_name"], cv2.WINDOW_NORMAL)
-    previous_state = None  # Pour tracker les changements d'état
+    # Création d'un détecteur YOLO
+    model = YOLO("yolov8n.pt")
+    
+    # Création d'une file pour la moyenne glissante
+    detection_buffer = deque(maxlen=6)
+    previous_avg_persons = -1
+
+    # Ajouter ces variables pour le suivi temporel
+    two_persons_start_time = None
+    message_sent = False
+
+    # Créer la fenêtre une seule fois avant la boucle
+    cv2.namedWindow('Flux vidéo ESP32', cv2.WINDOW_NORMAL)
 
     while True:
         ret, frame = cap.read()
+
         if not ret:
-            print(f"Erreur : Impossible de lire l'image de {cam_id}")
+            print("Erreur : Impossible de lire l'image")
             break
 
         # Effectuer la détection avec YOLO
         results = model.predict(frame, conf=0.5)
         
         # Compter le nombre de personnes
-        num_persons = sum(1 for r in results for c in r.boxes.cls if int(c) == 0)
+        num_persons = 0
+        for r in results:
+            for c in r.boxes.cls:
+                if int(c) == 0:  # 0 est l'ID de la classe "person"
+                    num_persons += 1
 
-        # Vérifier si l'objectif est atteint
-        with reset_lock:
-            current_time = time.time()
-            if num_persons == cam_config["target"]:
-                if target_reached_time[cam_id] == 0:
-                    target_reached_time[cam_id] = current_time
-            else:
-                target_reached_time[cam_id] = 0
-
-            # Vérifier si les deux caméras ont atteint leur objectif pendant 3 secondes
-            all_targets_reached = all(
-                t > 0 and current_time - t >= 3 
-                for t in target_reached_time.values()
-            )
-            
-            if all_targets_reached:
-                success_state = True
-
-        # Envoyer le message MQTT si l'état change
-        if client:
-            current_state = "Bravo" if success_state else f"Humains:{num_persons}"
-            if current_state != previous_state:
-                try:
-                    client.publish(cam_config["topic"], current_state)
-                    print(f"Message MQTT envoyé pour {cam_id}: {current_state}")
-                    previous_state = current_state
-                except Exception as e:
-                    print(f"Erreur d'envoi MQTT pour {cam_id}: {e}")
-
-        # Préparer l'affichage
-        annotated_frame = results[0].plot()
+        # Ajouter la détection courante au buffer
+        detection_buffer.append(num_persons)
         
-        # Afficher le texte approprié
-        if success_state:
-            cv2.putText(annotated_frame, "Bravo !!", (10, 30),
-                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            cv2.putText(annotated_frame, "Rouge 1", (10, 70),
-                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        else:
-            cv2.putText(annotated_frame, f"Personnes: {num_persons}/{cam_config['target']}", 
-                       (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # Calculer la moyenne arrondie
+        avg_persons = round(sum(detection_buffer) / len(detection_buffer))
 
-        cv2.imshow(cam_config["window_name"], annotated_frame)
+        # Si on n'attend pas un reset, on peut envoyer des messages
+        if not waiting_for_reset:
+            if avg_persons == 2:
+                if two_persons_start_time is None:
+                    two_persons_start_time = time.time()
+                elif time.time() - two_persons_start_time >= DETECTION_TIME_THRESHOLD:
+                    try:
+                        if client:
+                            client.publish(MQTT_TOPIC, "Bravo\nRouge 6")
+                            print("Message spécial envoyé: Bravo\\nRouge 6")
+                            waiting_for_reset = True  # On attend maintenant un reset
+                    except Exception as e:
+                        print(f"Erreur d'envoi MQTT: {e}")
+            else:
+                two_persons_start_time = None
+
+            # Envoyer le message MQTT du nombre de personnes
+            if client and avg_persons != previous_avg_persons:
+                try:
+                    mqtt_message = f"Humains:{avg_persons}"
+                    client.publish(MQTT_TOPIC, mqtt_message)
+                    print(f"Message MQTT envoyé: {mqtt_message}")
+                    previous_avg_persons = avg_persons
+                except Exception as e:
+                    print(f"Erreur d'envoi MQTT: {e}")
+
+        # Modifier l'affichage pour montrer la moyenne
+        annotated_frame = results[0].plot()
+        cv2.putText(annotated_frame, f"Personnes (moy): {avg_persons}", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+        # Mettre à jour l'affichage dans la fenêtre existante
+        cv2.imshow('Flux vidéo ESP32', annotated_frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
         time.sleep(0.01)
 
-    cap.release()
-    cv2.destroyWindow(cam_config["window_name"])
-
-def main():
-    # Initialisation du client MQTT
-    try:
-        client = mqtt.Client(protocol=mqtt.MQTTv5)
-        client.on_connect = on_connect
-        client.on_disconnect = on_disconnect
-        client.on_message = on_message
-        
-        print("Tentative de connexion au broker MQTT...")
-        client.connect(MQTT_BROKER, 1883, keepalive=60)
-        client.loop_start()
-    except Exception as e:
-        print(f"Erreur de connexion MQTT: {e}")
-        print("Continuation sans MQTT...")
-        client = None
-
-    # Création d'un détecteur YOLO
-    model = YOLO("yolov8n.pt")
-
-    # Créer et démarrer les threads pour chaque caméra
-    threads = []
-    for cam_id, cam_config in CAMERAS.items():
-        thread = threading.Thread(
-            target=process_camera,
-            args=(cam_id, cam_config, model, client)
-        )
-        thread.start()
-        threads.append(thread)
-
-    # Attendre que tous les threads se terminent
-    for thread in threads:
-        thread.join()
-
     # Nettoyage
+    cap.release()
     cv2.destroyAllWindows()
     if client:
         client.loop_stop()
