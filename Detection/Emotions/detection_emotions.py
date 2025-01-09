@@ -5,7 +5,10 @@ import numpy as np
 import random
 import time
 
-from emotion_validator import EmotionValidator
+from src.emotion_validator import EmotionValidator
+from src.mqtt_message import start_mqtt_service
+
+mqtt_service = start_mqtt_service(on_cmd_receive=lambda cmd: cmd_receive(cmd))
 
 # Initialisation de l'API Roboflow
 rf = Roboflow(api_key="DPxWxOvyi036rO9Y7uKQ")
@@ -13,7 +16,7 @@ project = rf.workspace().project("emotion-detection-cwq4g")
 model = project.version(1).model
 
 # Capture du flux vidéo (0 pour la caméra par défaut)
-capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
+capture = cv2.VideoCapture(1, cv2.CAP_V4L2)
 
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
@@ -135,13 +138,20 @@ def show_text(res):
             if len(detected) == 3:
                 time.sleep(1)
     else:
-        print(res)
         if res == "Fin":
+            cv2.putText(text_frame, "4", (370, 350), cv2.FONT_HERSHEY_SIMPLEX, 8.0, (67, 198, 231), 8, cv2.LINE_AA)
+            data = "finish"
+            mqtt_service.publish(data, "/detection/emotions/status")
+        elif res == "Attente":
             cv2.putText(text_frame, "4", (370, 350), cv2.FONT_HERSHEY_SIMPLEX, 8.0, (67, 198, 231), 8, cv2.LINE_AA)
 
             
 
     cv2.imshow("Fenêtre Texte", text_frame)
+
+def cmd_receive(cmd):
+    if cmd == "reset":
+        validator.reset()
 
 # Créer les fenêtres
 cv2.namedWindow("Flux vidéo annoté", cv2.WINDOW_NORMAL)
@@ -203,3 +213,4 @@ while True:
 # Libérer les ressources
 capture.release()
 cv2.destroyAllWindows()
+mqtt_service.stop()

@@ -14,7 +14,23 @@ class EmotionValidator:
             2: None,
             3: None
         }
-        self.level = 2
+        self.level = 1
+        self.fini = False
+    
+    def reset(self):
+        self.level = 1
+        self.state = {
+            1: [],
+            2: [],
+            3: []
+        }
+        # Horodatage pour chaque niveau
+        self.start_time = {
+            1: None,
+            2: None,
+            3: None
+        }
+        self.fini = False
 
     def validateLevel(self, detected_emotions):
         # Définitions des séquences à respecter pour chaque niveau
@@ -34,7 +50,10 @@ class EmotionValidator:
         }
 
         if self.level not in sequences:
-            return "Fin"  # Niveau invalide
+            if self.fini == False:
+                self.fini = True
+                return "Fin"  # Niveau invalide
+            return "Attente"
 
         # Initialiser le temps de début si ce n'est pas encore fait
         if self.level != 2 and self.start_time[self.level] is None and detected_emotions:
