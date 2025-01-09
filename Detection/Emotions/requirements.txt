@@ -1,0 +1,7 @@
+opencv-python>=4.5.5
+keras 
+numpy
+pandas
+roboflow
+supervision
+paho-mqtt==1.6.1
