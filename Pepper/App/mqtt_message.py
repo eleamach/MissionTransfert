@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import time
+from naoqi import ALProxy  # Pour interagir avec Pepper
 import paho.mqtt.client as mqtt_client
 
 class MqttService:
@@ -13,9 +14,15 @@ class MqttService:
         self.on_cmd_receive = on_cmd_receive
         self.connected = False
         self.capteur_data = None  # Ajouter un attribut pour stocker les données du capteur
-        self.detection_data = None  # Ajouter un attribut pour stocker les données de détection
-        self.ia_data = None  # Ajouter un attribut pour stocker les données de l'IA
+        self.qi_session = None  # Ajouter une session Qi pour Pepper
         
+        # Initialiser ALMemory
+        try:
+            self.qi_session = ALProxy("ALMemory", "10.50.90.104", 9559)  # Remplacez l'adresse IP par celle de Pepper
+            print("Connexion réussie à ALMemory")
+        except Exception as e:
+            print("Erreur lors de la connexion à ALMemory : {}".format(e))
+
     def on_connect(self, client, userdata, flags, rc):
         """ Callback pour la connexion réussie au broker """
         if rc == 0:
@@ -26,6 +33,7 @@ class MqttService:
             self.client.subscribe("/pepper/capteur/status")
             self.client.subscribe("/pepper/detection/status")
             self.client.subscribe("/pepper/ia/status")
+            self.client.subscribe("/game/time")
         else:
             print("Failed to connect, return code {}".format(rc))
 
@@ -70,21 +78,50 @@ class MqttService:
 
     def on_message(self, client, userdata, message):
         """ Callback pour traiter les messages reçus """
-        print("Message reçu sur le topic {}: {}".format(message.topic, message.payload.decode()))
-
         # Vérifier quel topic a envoyé le message et envoyer les informations vers d'autres fonctions ou modules
         if message.topic == "/pepper/cmd":
             self.on_cmd_receive(message.payload.decode())
         elif message.topic == "/pepper/capteur/status":
             self.capteur_data = message.payload.decode()
+            if self.capteur_data.lower() == "finish":
+                self.raise_pepper_event("ValidatecodeCapteur") 
         elif message.topic == "/pepper/detection/status":
             self.detection_data = message.payload.decode()
+            if self.detection_data.lower() == "finish":
+                self.raise_pepper_event("ValidatecodeDetection")  
         elif message.topic == "/pepper/ia/status":
             self.ia_data = message.payload.decode()
-        else:
-            print("Topic non géré : {}".format(message.topic))
+            if self.ia_data.lower() == "finish":
+                self.raise_pepper_event("ValidatecodeIA")  
+        elif message.topic == "/game/time":
+            self.game_time = message.payload.decode()
+            # Traiter les données de temps du jeu
+            print("Payload : {}".format(self.game_time))
+            self.raise_pepper_event_with_data("GameStart", self.game_time)
 
+    def raiseEvent(self, event_name):
+        """ Lève un événement dans ALMemory """
+        if self.qi_session:
+            try:
+                self.qi_session.raiseEvent(event_name, True)
+                print("Événement levé : {}".format(event_name))
+            except Exception as e:
+                print("Erreur lors de la levée de l'événement : {}".format(e))
+        else:
+            print("QiSession non disponible. Impossible de lever l'événement.")
+        
+    def raise_pepper_event_with_data(self, event_name, data):
+        """ Lève un événement dans ALMemory """
+        if self.qi_session:
+            try:
+                self.qi_session.raiseEvent(event_name, str(data))
+                print("Événement levé : {}".format(event_name))
+            except Exception as e:
+                print("Erreur lors de la levée de l'événement : {}".format(e))
+        else:
+            print("QiSession non disponible. Impossible de lever l'événement.")
                 
+
 def start_mqtt_service(on_cmd_receive):
     """ Démarre le service MQTT et gère les messages reçus """
     # Initialiser le service avec une fonction callback pour la réception des commandes

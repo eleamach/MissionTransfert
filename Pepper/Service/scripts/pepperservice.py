@@ -27,6 +27,7 @@ class PepperService(object):
         self.tablet = self.session.service("ALTabletService")
         self.tablet.loadApplication("elea")
         self.tablet.showWebview()
+
         
     def play_animation(self, animation_name):
         try:
@@ -36,6 +37,7 @@ class PepperService(object):
             
     def raise_event(self, event_name, value):
         try:
+            print("Raising event {} with value {}".format(event_name, value))
             self.memory.raiseEvent(event_name, value)
         except Exception as e:
             self.logger.error("Erreur lors de la levée de l'événement {}: {}".format(event_name, e))
