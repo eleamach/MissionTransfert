@@ -84,7 +84,6 @@ def show_text(res):
                 time.sleep(1)
         
         elif level == "2":
-            print(detected)
             if not detected:
                 overlay_image(text_frame, happy_resized, 50, 80)
                 overlay_image(text_frame, sad_resized, 200, 80)
