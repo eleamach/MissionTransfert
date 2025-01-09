@@ -1,0 +1,6 @@
+opencv-python>=4.5.5
+keras 
+numpy
+pandas
+roboflow
+supervision
