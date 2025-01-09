@@ -151,6 +151,8 @@ def show_text(res):
 def cmd_receive(cmd):
     if cmd == "reset":
         validator.reset()
+        data = "waiting"
+        mqtt_service.publish(data, "/detection/emotions/status")
 
 # Créer les fenêtres
 cv2.namedWindow("Flux vidéo annoté", cv2.WINDOW_NORMAL)
