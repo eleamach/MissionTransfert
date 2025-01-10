@@ -31,6 +31,8 @@ def main():
         subscriberfinal.signal.connect(lambda arg: finalcorrect(arg, pepper_service, mqtt_service))   
         subscriberperdu = memory.subscriber("timeout")
         subscriberperdu.signal.connect(lambda arg: finalincorrect(arg, pepper_service, mqtt_service))   
+        subscriberparole = memory.subscriber("Parole")
+        subscriberparole.signal.connect(lambda arg: parole(arg, pepper_service, mqtt_service))   
               
         
         # Boucle d'attente jusqu'à recevoir le message "start"
@@ -80,12 +82,16 @@ def finalincorrect(arg, pepper_service, mqtt_service):
 def reset(arg, pepper_service, mqtt_service):
     print("Commande {} reçue, réinitialisation".format(arg))
 
+def parole(arg, pepper_service, mqtt_service):
+    print("Parole reçue: {}".format(arg))
+    pepper_service.speak(arg)
+
 def cmd_receive(cmd, pepper_service, is_started, mqtt_service):
     """ Fonction appelée à la réception d'une commande """
     if cmd == "start":
         print("Commande 'start' reçue, lancement de partie_1")
         partie_1(pepper_service)
-        mqtt_service.publish("in game", "/game/status")
+        mqtt_service.publish("in_game", "/game/status")
         is_started = True 
         return is_started 
     elif cmd == "reset":

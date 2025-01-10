@@ -28,13 +28,17 @@ class PepperService(object):
         self.tablet.loadApplication("elea")
         self.tablet.showWebview()
 
-        
+        # Gestion des états
+        self.current_state = "idle"  # État initial
+        self.selected_workshop = None  # Atelier choisi
+        self.hint = None  # Indice choisi
+
     def play_animation(self, animation_name):
         try:
             self.animation_player.run(animation_name) 
         except Exception as e:
             self.logger.error("Erreur lors du lancement de l'animation : {}".format(e))
-            
+
     def raise_event(self, event_name, value):
         try:
             print("Raising event {} with value {}".format(event_name, value))
@@ -42,7 +46,7 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors de la levée de l'événement {}: {}".format(event_name, e))
 
-    def speak_n_animate(self, id, datakey, animation, professors, maitre ):
+    def speak_n_animate(self, id, datakey, animation, professors, maitre):
         try:
             if professors:
                 self.tts.setParameter("speed", 110)
@@ -59,6 +63,12 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors de la parole ou de l'animation: {}".format(e))
 
+    def speak(self, arg):
+        try:
+            self.tts.say(arg)
+        except Exception as e:
+            self.logger.error("Erreur lors de la parole : {}".format(e))
+
     def play_music(self, file):        
         try:
             file_id = self.audio_player.loadFile(file)
@@ -66,7 +76,7 @@ class PepperService(object):
             self.running_audio_ids = [file_id]
         except Exception as e:
             self.logger.error("Erreur lors de la lecture de la musique : {}".format(e))
-    
+
     def subscribe(self, speech_recognition, module_name):
         if module_name not in self.active_subscriptions:
             try:
@@ -86,27 +96,25 @@ class PepperService(object):
                 self.logger.error("Erreur lors du désabonnement de {} : {}".format(module_name, e))
         else:
                 self.logger.warning("Tentative de désabonnement de {}, mais il n'était pas abonné.".format(module_name))
-    
+
     def on_touch_changed(self, data):
         try:
             for touch in data:
                 sensor_name = touch[0]
                 is_touched = touch[1]
                 if sensor_name in ["Head/Touch/Front", "Head/Touch/Middle", "Head/Touch/Rear"] and is_touched:
-                    try:
-                        self.tts.say("Un indice peut-être ?")
-                        speech_recognition = self.session.service("ALSpeechRecognition")
-                        vocabulary = ["oui", "non"]
-                        speech_recognition.pause(True)
-                        speech_recognition.setVocabulary(vocabulary, False)
-                        speech_recognition.pause(False)
-                        memory = self.session.service("ALMemory")
-                        word_recognized_subscriber = memory.subscriber("WordRecognized")
-                        word_recognized_subscriber.signal.connect(self.on_word_recognized)
-                        self.subscribe(speech_recognition, "IndiceDialog")
-                        time.sleep(10) 
-                    except Exception as e:
-                        self.logger.error("Erreur lors de l'indice : {}".format(e))
+                    self.tts.say("Un indice peut-être ?")
+                    speech_recognition = self.session.service("ALSpeechRecognition")
+                    vocabulary = ["oui", "non"]
+                    speech_recognition.pause(True)
+                    speech_recognition.setVocabulary(vocabulary, False)
+                    speech_recognition.pause(False)
+                    memory = self.session.service("ALMemory")
+                    word_recognized_subscriber = memory.subscriber("WordRecognized")
+                    word_recognized_subscriber.signal.connect(self.on_word_recognized)
+                    self.subscribe(speech_recognition, "IndiceDialog")
+                    self.current_state = "choix_atelier"  # Mise à jour de l'état
+                    time.sleep(10)
                     break
         except Exception as e:
             self.logger.error("Erreur lors du traitement des données tactiles : {}".format(e))
@@ -116,22 +124,22 @@ class PepperService(object):
             word = data[0]
             confidence = data[1]            
             if confidence > 0.5:
-                if word == "oui":
-                    self.tts.say("A quel atelier êtes-vous ? Si vous avez un doute sur le nom, regardez l'étiquette vers votre atelier") 
-                    try:
+                if self.current_state == "choix_atelier":
+                    if word == "oui":
+                        self.tts.say("A quel atelier êtes-vous ? Si vous avez un doute sur le nom, regardez l'étiquette vers votre atelier") 
                         speech_recognition = self.session.service("ALSpeechRecognition")
                         speech_recognition.pause(True)
-                        workshops = ["Simon", "Masterminde", "Texte"] 
+                        workshops = ["Simon", "Mastermind", "Texte", "Tof", "Bouton", "Onsaitpas", "Visage", "Camera", "Emotion", "Reconnaissance", "Images", "Labyrinthe"] 
                         speech_recognition.setVocabulary(workshops, False)
                         speech_recognition.pause(False)
                         workshop_recognition_subscriber = self.memory.subscriber("WordRecognized")
                         workshop_recognition_subscriber.signal.connect(self.on_workshop_recognized)
                         self.subscribe(speech_recognition, "WorkshopDialog")
-                        time.sleep(10)  
-                    except Exception as e:
-                        self.logger.error("Erreur lors de la demande du nom de l'atelier : {}".format(e))
-                elif word == "non":
-                    self.tts.say("Très bien, pas d'indice.")
+                        self.current_state = "attente_atelier"  # Mise à jour de l'état
+                        time.sleep(10)
+                    elif word == "non":
+                        self.tts.say("Très bien, pas d'indice.")
+                        self.current_state = "idle"  # Retour à l'état initial
         except Exception as e:
             self.logger.error("Erreur lors du traitement de la reconnaissance vocale : {}".format(e))
 
@@ -139,41 +147,40 @@ class PepperService(object):
         try:
             workshop = data[0]  
             confidence = data[1] 
-            speech_recognition = self.session.service("ALSpeechRecognition")
-            if confidence > 0.5:
-                self.tts.say("Vous avez choisi l'atelier {}. Voulez-vous le premier indice, le second indice ou la solution ?".format(workshop))
-                self.selected_workshop = workshop  
-                try:
-                    speech_recognition.pause(True)
-                    options = ["premier", "second", "solution"]  
-                    speech_recognition.setVocabulary(options, False)
-                    speech_recognition.pause(False)
-                    hint_recognition_subscriber = self.memory.subscriber("WordRecognized")
-                    hint_recognition_subscriber.signal.connect(self.on_hint_recognized)
-                    self.subscribe(speech_recognition, "HintDialog")
-                    time.sleep(10)  
-                except Exception as e:
-                    self.logger.error("Erreur lors de la demande du choix de l'indice : {}".format(e))
-                    self.unsubscribe(speech_recognition, "WorkshopDialog")
+            if self.current_state == "attente_atelier" and confidence > 0.5:
+                self.tts.say("Vous avez choisi l'atelier {}. Voulez-vous le premier indice, le deuxième ou le troisième ?".format(workshop))
+                self.selected_workshop = workshop
+                speech_recognition = self.session.service("ALSpeechRecognition")
+                speech_recognition.pause(True)
+                options = ["premier", "deuxième", "troisième"]  
+                speech_recognition.setVocabulary(options, False)
+                speech_recognition.pause(False)
+                hint_recognition_subscriber = self.memory.subscriber("WordRecognized")
+                hint_recognition_subscriber.signal.connect(self.on_hint_recognized)
+                self.subscribe(speech_recognition, "HintDialog")
+                self.current_state = "attente_indice"  # Mise à jour de l'état
+                time.sleep(10)
         except Exception as e:
             self.logger.error("Erreur lors de la reconnaissance du nom de l'atelier : {}".format(e))
-    
+
     def on_hint_recognized(self, data):
         try:
-            if data[0] == "premier":
-                self.hint = "0"
-            elif data[0] == "second":
-                self.hint = "1"
-            elif data[0] == "solution":
-                self.hint = "2" 
-            speech_recognition = self.session.service("ALSpeechRecognition")
-            if data[1] > 0.5:  
+            word = data[0]
+            confidence = data[1]
+            if self.current_state == "attente_indice" and confidence > 0.5:
+                if word == "premier":
+                    self.hint = "0"
+                elif word == "deuxième":
+                    self.hint = "1"
+                elif word == "troisième":
+                    self.hint = "2" 
+
                 if self.hint in ["0", "1", "2"]: 
                     json_data = self.get_json("/home/elea.machillot/Documents/S1_G1_Machillot_Perbet_Jeannin_Delcamp/Pepper/Script/indice.json")
                     self.tts.say(json_data[self.selected_workshop][int(self.hint)])
                 else:
                     self.tts.say("Je n'ai pas compris votre choix.")
-            self.unsubscribe(speech_recognition, "HintDialog")
+                self.current_state = "idle"  # Retour à l'état initial
         except Exception as e:
             self.logger.error("Erreur lors de la reconnaissance du choix de l'indice : {}".format(e))
 
@@ -201,7 +208,6 @@ class PepperService(object):
             except Exception as e:
                 self.logger.error("Erreur lors du désabonnement de {}".format(subscription))
         self.active_subscriptions.clear()
-
 
 if __name__ == "__main__":
     import stk.runner

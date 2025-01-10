@@ -4,15 +4,60 @@
         "Pour réussir, il faut bien observer la séquence de couleurs qui s'affiche et la reproduire en appuyant sur les boutons correspondants. Vous avez 3 niveaux de difficulté : facile, moyen et difficile.",
         "Les leds vertes indiquent votre niveau actuel de difficulté. Le premier niveau est facile soit 5 boutons, le deuxième niveau est moyen soit 8 boutons et le troisième niveau est difficile avec 10 boutons"
     ],
-    "Masterminde" : [
+    "Mastermind" : [
         "Cet atelier est un Masterminde. Il consiste à trouver un code secret parmis les 6 couleurs disponible en un minimum de tentatives. Ici, 15 tantatives sont autorisées.",
-        "À chaque tentative, des leds vertes et rouges s'allument pour indiquer le nombre de couleurs bien placées ou mal placées. Vous pouvez voir sur l'ecran le nombre d'essai qu'il vous reste. Le code secret est généré aléatoirement à la fin de vos essais.",
-        "todo" 
+        "À chaque tentative, des leds vertes et rouges s'allument pour indiquer le nombre de couleurs bien placées ou mal placées. ",
+        "Vous pouvez voir sur l'ecran le nombre d'essai qu'il vous reste. Le code secret est généré aléatoirement à la fin de vos essais." 
     ],
     "Texte" : [
         "Cette voix parle beaucoup mais répète souvent le même mot... C'est un peu lourd à la fin. Mais bon, c'est pas grave, on l'aime bien quand même. Enfin, on l'aime bien, c'est vite dit. En fait, on l'aime pas du tout. Mais bon, on fait avec. C'est la vie. ",
         "Les details sont importants. Il faut bien observer ton environnement pour trouver la solution",
         "Je crois avoir entendu la madame qui parle beaucoup dire plusieurs fois le mot robotique. Pas vous ?"
+    ],
+    "Tof" : [
+        "Le cube que vous voyez permet de mesurer les distances sur 4 faces.",
+        "Il serait interessant d'être à plusieurs sur cet atelier je pense.",
+        "Pensez à regarder les Leds ! Elles vous indiquent en fonction des couleurs si vous être proches ou pas de la distance."
+    ],
+    "Bouton" : [
+        "Etrange ce bouton, n'es-ce pas ? Rien ne se passe quand on appuie dessus... Peut-être qu'il en faut plusieurs ?",
+        "Il se pourrait qu'un écran soit assez proche d'un des boutons. Il indique des choses interessantes.",
+        "4 boutons sont éparpillé dans la pièce. Il faut les trouver et les activer ensemble pour débloquer l'atelier suivant."
+    ],
+    "Onsaitpas" : [
+        "",
+        "",
+        ""
+    ],
+    "Camera" : [
+        "Deux caméras sont disposées dans la pièce. Tu devrais faire attention aux nombre affiché sur l'ecran",
+        "Les nombres indiqué correspondent aux nombres de personnes qu'il faut sur chaque caméra. Tu devrais peut-être essayer de trouver les bonnes positions.",
+        "Sur une caméra, il faut rois personnes tandis que sur l'autres il en faut quatre. Il faut trouver les bonnes positions pour débloquer l'atelier suivant. Essaie de te cacher derrière quelqu'un ?"
+    ],
+    "Visage" : [
+        "Etrange cette couleur rouge sur votre visage n'est-ce pas ? Il se pourrait que cela soit un indice.",
+        "Cet atelier attends un certain visage je crois. Il faudrait peut-être essayer de trouver le bon ?",
+        "Essayer sur certains visage de la pièce, vous trouverez peut-être la solution."
+    ],
+    "Emotion" : [
+        "Cet atelier est composé de 3 niveaux de difficulté. Regardez autour de vous, observez bien les émotions qu'il faut reproduire. N'oubliez pas l'ordre pour le premier niveau.",
+        "La caméra peux détécter les émotions suivantes : la joie, la tristesse, la colère, la surprise, la peur, le dégoût et le naturel.",
+        "Le premier atelier consiste à reproduire l'emotion du smiley que vous avez trouvez sur une affiche dans la salle. Pour le deuxième atelier, vous devrez faire en même temps les émotions des couleurs associées. Et enfin, pour le troisème atelier, le texte vous donne des indices sur les émotions qu'il vous faut reproduire."
+    ],
+    "Reconnaissance" : [
+        "test",
+        "",
+        ""
+    ],
+    "Images"    : [
+        "La salle de possède de jolies images. Mais quelque chose d'étrange se dégage de ces images, vous ne trouvez-pas ?",
+        "Essayez de regarder de côté, de plisser les yeux, de vous éloigner ou de vous raprocher. Vous trouverez peut-être la solution.",
+        "Un chiffre et une couleur sont cachés dans les images. Il faut les trouver pour débloquer l'atelier suivant."
+    ],
+    "Labyrinthe" : [
+        "Cet atelier est découpé en quatre niveaux. Vous devrez créer un algorithme qui permet de trouver le chemin le plus court pour atteindre la sortie. Cet algorithme est beaucoup utilisé pour les robots.",
+        "Une explication est disponible sur l'atelier. Vous devez faire +1 en haut, à gauche et à droite de là où vous êtes. Ceci jusqu'à atteindre la sortie.",
+        "Vous devrez reproduire le chemin sur le labyrinthe puis rentrer sur le digicode le poids final. Si vous avez réussi, vous pourrez passer à l'atelier suivant."
     ]
 }
 

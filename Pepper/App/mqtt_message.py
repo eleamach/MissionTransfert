@@ -34,6 +34,7 @@ class MqttService:
             self.client.subscribe("/pepper/detection/status")
             self.client.subscribe("/pepper/ia/status")
             self.client.subscribe("/game/time")
+            self.client.subscribe("/pepper/parole")
         else:
             print("Failed to connect, return code {}".format(rc))
 
@@ -84,20 +85,25 @@ class MqttService:
         elif message.topic == "/pepper/capteur/status":
             self.capteur_data = message.payload.decode()
             if self.capteur_data.lower() == "finish":
-                self.raise_pepper_event("ValidatecodeCapteur") 
+                self.raiseEvent("ValidatecodeCapteur") 
         elif message.topic == "/pepper/detection/status":
             self.detection_data = message.payload.decode()
             if self.detection_data.lower() == "finish":
-                self.raise_pepper_event("ValidatecodeDetection")  
+                self.raiseEvent("ValidatecodeDetection")  
         elif message.topic == "/pepper/ia/status":
             self.ia_data = message.payload.decode()
             if self.ia_data.lower() == "finish":
-                self.raise_pepper_event("ValidatecodeIA")  
+                self.raiseEvent("ValidatecodeIA")  
         elif message.topic == "/game/time":
             self.game_time = message.payload.decode()
             # Traiter les données de temps du jeu
             print("Payload : {}".format(self.game_time))
             self.raise_pepper_event_with_data("GameStart", self.game_time)
+        elif message.topic == "/pepper/parole":
+            self.parole_data = message.payload.decode()
+            # Traiter les données de parole
+            print("Payload : {}".format(self.parole_data))
+            self.raise_pepper_event_with_data("Parole", self.parole_data)
 
     def raiseEvent(self, event_name):
         """ Lève un événement dans ALMemory """
