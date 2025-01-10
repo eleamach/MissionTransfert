@@ -17,6 +17,9 @@ class MQTTHandler:
     TOPIC_TEXTE_CMD = "/ia/texte/cmd"
     TOPIC_VOCALE_CMD = "/ia/vocale/cmd"
     TOPIC_LABYRINTHE_CMD = "/ia/labyrinthe/cmd"
+
+    # Command topic pepper
+    TOPIC_PEPPER_CMD = "/pepper/cmd"
     
     # Status topics for "capteur" lot
     TOPIC_BUTTON_STATUS = "/capteur/bouton/status"
@@ -33,9 +36,16 @@ class MQTTHandler:
     TOPIC_TEXTE_STATUS = "/ia/texte/status"
     TOPIC_VOCALE_STATUS = "/ia/vocale/status"
     TOPIC_LABYRINTHE_STATUS = "/ia/labyrinthe/status"
+
+    # Status topic pepper
+    TOPIC_PEPPER_STATUS = "/pepper/status"
+    TOPIC_PEPPER_CAPTEUR_STATUS = "/pepper/capteur/status"
+    TOPIC_PEPPER_DETECTION_STATUS = "/pepper/detection/status"
+    TOPIC_PEPPER_IA_STATUS = "/pepper/ia/status"
     
     # Game topic for clock
     TOPIC_GAME_TIME = "/game/time"
+    TOPIC_GAME_STATUS = "/game/status"
 
     def __init__(self, message_callback: Callable):
         self.client = mqtt.Client()
@@ -57,7 +67,11 @@ class MQTTHandler:
             # IA lot
             self.TOPIC_TEXTE_STATUS: "texte",
             self.TOPIC_VOCALE_STATUS: "vocale",
-            self.TOPIC_LABYRINTHE_STATUS: "labyrinthe"
+            self.TOPIC_LABYRINTHE_STATUS: "labyrinthe",
+            # pepper
+            self.TOPIC_PEPPER_STATUS: "pepper_status",
+            # game
+            self.TOPIC_GAME_STATUS: "game_status"
         }
         
         # Mapping of command topics
@@ -74,7 +88,11 @@ class MQTTHandler:
             # IA lot
             "texte": self.TOPIC_TEXTE_CMD,
             "vocale": self.TOPIC_VOCALE_CMD,
-            "labyrinthe": self.TOPIC_LABYRINTHE_CMD
+            "labyrinthe": self.TOPIC_LABYRINTHE_CMD,
+            # pepper
+            "pepper_cmd": self.TOPIC_PEPPER_CMD,
+            # game
+            "game_status": self.TOPIC_GAME_STATUS
         }
 
     def on_connect(self, client, userdata, flags, rc):
@@ -83,8 +101,7 @@ class MQTTHandler:
         # Subscribe to all status topics
         for topic in self.status_topics.keys():
             client.subscribe(topic)
-        # Reset all workshops
-        self.reset_workshops()
+        client.subscribe(self.TOPIC_PEPPER_CMD)
 
     def on_message(self, client, userdata, msg):
         """Called when a message is received from the broker."""
@@ -93,11 +110,6 @@ class MQTTHandler:
             status = msg.payload.decode()
             self.message_callback(workshop_type, status)
 
-    def reset_workshops(self):
-        """Sends reset command to all workshops."""
-        for workshop in self.cmd_topics:
-            self.client.publish(self.cmd_topics[workshop], "reset")
-            print(f"Reset command sent to {workshop}")
 
     def clock_publish(self, time_str: str):
         """Publishes the time to the game time topic."""
@@ -108,7 +120,7 @@ class MQTTHandler:
     def run(self):
         """Connects to the broker and starts the loop to process messages."""
         try:
-            self.client.connect("localhost", 1883, 60)
+            self.client.connect("134.214.51.148", 1883, 60)
             self.client.loop_forever()
         except KeyboardInterrupt:
             print("Stopping MQTT client")
