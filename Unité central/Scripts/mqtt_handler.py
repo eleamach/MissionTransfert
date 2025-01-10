@@ -69,7 +69,7 @@ class MQTTHandler:
             self.TOPIC_VOCALE_STATUS: "vocale",
             self.TOPIC_LABYRINTHE_STATUS: "labyrinthe",
             # pepper
-            self.TOPIC_PEPPER_STATUS: "pepper",
+            self.TOPIC_PEPPER_STATUS: "pepper_status",
             # game
             self.TOPIC_GAME_STATUS: "game_status"
         }
@@ -90,7 +90,7 @@ class MQTTHandler:
             "vocale": self.TOPIC_VOCALE_CMD,
             "labyrinthe": self.TOPIC_LABYRINTHE_CMD,
             # pepper
-            "pepper": self.TOPIC_PEPPER_CMD,
+            "pepper_cmd": self.TOPIC_PEPPER_CMD,
             # game
             "game_status": self.TOPIC_GAME_STATUS
         }
@@ -101,6 +101,7 @@ class MQTTHandler:
         # Subscribe to all status topics
         for topic in self.status_topics.keys():
             client.subscribe(topic)
+        client.subscribe(self.TOPIC_PEPPER_CMD)
 
     def on_message(self, client, userdata, msg):
         """Called when a message is received from the broker."""
@@ -119,7 +120,7 @@ class MQTTHandler:
     def run(self):
         """Connects to the broker and starts the loop to process messages."""
         try:
-            self.client.connect("localhost", 1883, 60)
+            self.client.connect("134.214.51.148", 1883, 60)
             self.client.loop_forever()
         except KeyboardInterrupt:
             print("Stopping MQTT client")
