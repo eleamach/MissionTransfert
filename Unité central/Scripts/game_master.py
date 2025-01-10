@@ -30,6 +30,7 @@ class GameMaster:
         self.state = GameState.STANDBY
         self.workshop_status = WorkshopStatus()
         self.mqtt_handler = MQTTHandler(self.handle_workshop_update)
+        self.mqtt_handler.client.message_callback_add(MQTTHandler.TOPIC_PEPPER_CMD, self.handle_pepper_cmd)
         print(f"Game initialized in STANDBY state")
         
     def start_timer(self):
@@ -63,6 +64,7 @@ class GameMaster:
                     self.workshop_status.simon == "finish" and 
                     self.workshop_status.tof == "finish"):
                     self.state = GameState.PHASE_2
+                    self.mqtt_handler.client.publish(MQTTHandler.TOPIC_PEPPER_CAPTEUR_STATUS, "finish")
                     print("All capteur workshops finished - Moving to PHASE_2!")
                     
             case GameState.PHASE_2:
@@ -71,6 +73,7 @@ class GameMaster:
                     self.workshop_status.emotions == "finish" and 
                     self.workshop_status.photo == "finish"):
                     self.state = GameState.PHASE_3
+                    self.mqtt_handler.client.publish(MQTTHandler.TOPIC_PEPPER_DETECTION_STATUS, "finish")
                     print("All detection workshops finished - Moving to PHASE_3!")
                     
             case GameState.PHASE_3:
@@ -78,32 +81,45 @@ class GameMaster:
                     self.workshop_status.vocale == "finish" and 
                     self.workshop_status.labyrinthe == "finish"):
                     self.state = GameState.COMPLETED
+                    self.mqtt_handler.client.publish(MQTTHandler.TOPIC_PEPPER_IA_STATUS, "finish")
                     print("All IA workshops finished - Game COMPLETED!")
 
     def start_game(self):
         """Starts the game by moving to PHASE_1 and starting the timer"""
         self.state = GameState.PHASE_1
         print("Moving to PHASE_1")
-        # Reset all workshops and start timer
-        self.mqtt_handler.reset_workshops()
         self.start_timer()
         # Start MQTT loop
         self.mqtt_handler.run()
 
+    def reset(self):
+        """Resets the game to its initial state."""
+        self.state = GameState.STANDBY
+
+    def handle_pepper_cmd(self, client, userdata, msg):
+        """Handles commands received on the /pepper/cmd topic."""
+        command = msg.payload.decode()
+        if command == "reset":
+            self.reset()
+    
+
 def main():
     game = GameMaster()
+
+    game_status=""
+
+    def handle_game_status(workshop_type, status):
+        nonlocal game_status
+        if workshop_type == "game_status":
+            game_status = (status == "in_game")
+
+    game.mqtt_handler.message_callback = handle_game_status
     
     while True:
-        user_input = input("Do you want to start the game? (o/n): ").lower()
-        if user_input == 'o':
+        if game_status == "in_game":
             print("Starting game...")
             game.start_game()
             break
-        elif user_input == 'n':
-            print("Game start cancelled")
-            break
-        else:
-            print("Invalid input. Please enter 'o' for yes or 'n' for no.")
 
 if __name__ == "__main__":
     main()

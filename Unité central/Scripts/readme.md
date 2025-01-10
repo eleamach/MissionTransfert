@@ -55,6 +55,7 @@ python game_master.py
 
 ## Topics du jeu
 - `/game/time` : Temps restant au format "MM:SS"
+- `/game/status`: Status du jeu
 - `/pepper/parole`: Faire parler pepper
 
 ## Valeurs possibles
@@ -66,6 +67,12 @@ python game_master.py
 ### Status
 - `waiting` : Workshop en attente
 - `finish` : Workshop terminé
+
+#### Status du jeu (`/game/status`)
+- `waiting` : Workshop en attente
+- `in game` : lancement du timer
+- `win` : Le jeu est gagner
+- `lose` : Le jeu est perdu
 
 ## Phases du jeu
 1. **PHASE_1** : Lot "capteur" fini
