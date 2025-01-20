@@ -119,8 +119,8 @@ def main():
                 elif time.time() - condition_start_time >= DETECTION_TIME_THRESHOLD:
                     try:
                         if client:
-                            client.publish(MQTT_TOPIC_CAM1, "Bravo\Rose 6")
-                            print("Message spécial envoyé: Bravo\\Rose 6")
+                            client.publish(MQTT_TOPIC_CAM1, "Bravo\Bleu 6")
+                            print("Message spécial envoyé: Bravo\\Bleu 6")
                             waiting_for_reset = True
                     except Exception as e:
                         print(f"Erreur d'envoi MQTT: {e}")
