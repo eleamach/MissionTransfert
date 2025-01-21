@@ -151,10 +151,10 @@ if __name__ == '__main__':
 
     # Définir 4 zones d'intérêt (ROI) au format (x1, y1, x2, y2)
     rois = [
-        (50, 200, 150, 300),  # ROI 1
-        (200, 200, 300, 300),  # ROI 2
+        (30, 200, 130, 300),  # ROI 1
+        (190, 200, 290, 300),  # ROI 2
         (350, 200, 450, 300),  # ROI 3
-        (500, 200, 600, 300)   # ROI 4
+        (510, 200, 610, 300)   # ROI 4
     ]
 
     # Suivi du temps pour afficher les résultats toutes les 0,5 secondes
