@@ -49,16 +49,16 @@ ENIGMES = {
 ENIGME_FINALE = {
     "question": """Félicitations !
     
-1. Je suis née dans un jardin, 
-   Les poètes m'ont chanté mille fois,
-   Symbole d'amour et de passion,
-   Mais attention à mes épines qui peuvent te piquer les doigts.
+1. Dans le spectre de Newton je suis présente,
+Entre le jaune et le bleu je danse,
+La chlorophylle me donne ma puissance,
+Complémentaire du magenta je me présente.
 
-2. Dans le carré magique de Saturne,
-   Retourné je reste le même,
-   Et les chats me considèrent comme leur nombre de vies.
+2. Je suis le nombre qui, divisé par 2, donne la racine carrée de ce que je deviens quand on me multiplie par moi-même.
+En binaire, je m'écris 1001.
+En chiffres romains, je suis composé d'un X moins un I.
 """,
-    "reponse": "rose 9"
+    "reponse": "vert 9"
 }
 
 # Configuration MQTT
