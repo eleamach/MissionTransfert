@@ -126,8 +126,8 @@ void messageReceived(String &topic, String &payload) {
   if(correcte == 4){
     tft.setCursor((tft.width() - 6 * 6 * 1) / 2, tft.height() / 2 - 30);
     tft.setTextSize(6);
-    tft.setTextColor(TFT_PURPLE);
-    tft.printf("%s", "8");
+    tft.setTextColor(TFT_GREEN);
+    tft.printf("%s", "3");
   }
   else{
     tft.setCursor((tft.width() - 6 * 3 * 5) / 2, tft.height() / 2 - 30);

@@ -292,13 +292,13 @@ void displayNumberOne() {
   blackout();
 
   // Active les LEDs nécessaires pour afficher le chiffre "1" en blanc
-  red[1]  = 255; green[1]  = 255; blue[1]  = 0;  // Première ligne, deuxième colonne
-  red[5]  = 255; green[5]  = 255; blue[5]  = 0;  // Deuxième ligne, deuxième colonne
-  red[4]  = 255; green[4]  = 255; blue[4]  = 0;  // Deuxième ligne, première colonne
-  red[9]  = 255; green[9]  = 255; blue[9]  = 0;  // Troisième ligne, deuxième colonne
-  red[13] = 255; green[13] = 255; blue[13] = 0;  // Quatrième ligne, deuxième colonne
-  red[14] = 255; green[14] = 255; blue[14] = 0;  // Quatrième ligne, troisième colonne
-  red[12] = 255; green[12] = 255; blue[12] = 0;  // Quatrième ligne, première colonne
+  red[13] = 255; green[13] = 255; blue[13] = 0;  // Deuxième ligne, première colonne
+  red[7]  = 255; green[7]  = 255; blue[7]  = 0;  // Quatrième ligne, troisième colonne
+  red[8]  = 255; green[8]  = 255; blue[8]  = 0;  // Première ligne, deuxième colonne
+  red[9]  = 255; green[9]  = 255; blue[9]  = 0;  // Deuxième ligne, deuxième colonne
+  red[10]  = 255; green[10]  = 255; blue[10]  = 0;  // Troisième ligne, deuxième colonne
+  red[11] = 255; green[11] = 255; blue[11] = 0;  // Quatrième ligne, deuxième colonne
+  red[15] = 255; green[15] = 255; blue[15] = 0;  // Quatrième ligne, première colonne
 
   // Met à jour les LEDs
   commit();
