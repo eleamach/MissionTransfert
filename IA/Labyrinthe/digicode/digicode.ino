@@ -42,7 +42,7 @@ void keypadEvent_num(KeypadEvent key) {
 }
 
 int step = 1;
-int result[] = {5, 25, 13, 36};
+int result[] = {16, 29, 22, 35};
 bool isComplete = false;
 
 void ecrireCode(uint16_t color, char* codeAfficher){
@@ -79,7 +79,7 @@ void validation(char code[4]) {
     tft.setTextColor(TFT_WHITE);
     tft.printf("Etape numero %d", step);
     if (step > 4) {  // Si on atteint la fin du tableau 'result', on recommence
-      ecrireCode(TFT_GREEN, "BRAVO");
+      ecrireCode(tft.color565(235, 41, 218), "7");
       isComplete = true;
       client.publish("/ia/labyrinthe/status", "finish");
       delay(5000);
