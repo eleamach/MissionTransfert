@@ -3,11 +3,17 @@ import qi
 import json
 import logging
 import time
+import stk.runner
+import stk.events
+import stk.services
+import stk.logging
+
 
 class PepperService(object):
     APP_ID = "com.elea.pepperservice"
 
     def __init__(self, qiapp):
+        super(PepperService, self).__init__()
         self.qiapp = qiapp
         self.session = qiapp.session
         self.tts = self.session.service("ALTextToSpeech")
@@ -33,12 +39,14 @@ class PepperService(object):
         self.selected_workshop = None  # Atelier choisi
         self.hint = None  # Indice choisi
 
+    @qi.bind(methodName="play_animation")
     def play_animation(self, animation_name):
         try:
             self.animation_player.run(animation_name) 
         except Exception as e:
             self.logger.error("Erreur lors du lancement de l'animation : {}".format(e))
 
+    @qi.bind(methodName="raise_event")
     def raise_event(self, event_name, value):
         try:
             print("Raising event {} with value {}".format(event_name, value))
@@ -46,6 +54,7 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors de la levée de l'événement {}: {}".format(event_name, e))
 
+    @qi.bind(methodName="speak_n_animate")
     def speak_n_animate(self, id, datakey, animation, professors, maitre):
         try:
             if professors:
@@ -63,12 +72,14 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors de la parole ou de l'animation: {}".format(e))
 
+    @qi.bind(methodName="speak")
     def speak(self, arg):
         try:
             self.tts.say(arg)
         except Exception as e:
             self.logger.error("Erreur lors de la parole : {}".format(e))
 
+    @qi.bind(methodName="play_music")
     def play_music(self, file):        
         try:
             file_id = self.audio_player.loadFile(file)
@@ -77,6 +88,7 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors de la lecture de la musique : {}".format(e))
 
+    @qi.bind(methodName="subscribe")
     def subscribe(self, speech_recognition, module_name):
         if module_name not in self.active_subscriptions:
             try:
@@ -87,6 +99,7 @@ class PepperService(object):
         else:
             self.logger.warning("{} est déjà abonné.".format(module_name))
 
+    @qi.bind(methodName="unsubscribe")
     def unsubscribe(self, speech_recognition, module_name):
         if module_name in self.active_subscriptions:
             try:
@@ -97,6 +110,7 @@ class PepperService(object):
         else:
                 self.logger.warning("Tentative de désabonnement de {}, mais il n'était pas abonné.".format(module_name))
 
+    @qi.bind(methodName="on_touch_changed")
     def on_touch_changed(self, data):
         try:
             for touch in data:
@@ -119,6 +133,7 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors du traitement des données tactiles : {}".format(e))
 
+    @qi.bind(methodName="on_word_recognized")
     def on_word_recognized(self, data):
         try:
             word = data[0]
@@ -143,6 +158,7 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors du traitement de la reconnaissance vocale : {}".format(e))
 
+    @qi.bind(methodName="on_workshop_recognized")
     def on_workshop_recognized(self, data):
         try:
             workshop = data[0]  
@@ -163,6 +179,7 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors de la reconnaissance du nom de l'atelier : {}".format(e))
 
+    @qi.bind(methodName="on_hint_recognized")
     def on_hint_recognized(self, data):
         try:
             word = data[0]
@@ -184,6 +201,7 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors de la reconnaissance du choix de l'indice : {}".format(e))
 
+    @qi.bind(methodName="get_json")
     def get_json(self, file):
         try:
             with open(file, "r") as f:
@@ -193,6 +211,7 @@ class PepperService(object):
             self.logger.error("Erreur lors de la lecture du fichier JSON : {}".format(e))
             return {}
 
+    @qi.bind(methodName="stop")
     def stop(self):
         try:
             self.cleanup_subscriptions()
@@ -200,6 +219,7 @@ class PepperService(object):
         except Exception as e:
             self.logger.error("Erreur lors de l'arrêt de l'application : {}".format(e))
 
+    @qi.bind(methodName="cleanup_subscriptions")
     def cleanup_subscriptions(self):
         speech_recognition = self.session.service("ALSpeechRecognition")
         for subscription in list(self.active_subscriptions):
@@ -210,5 +230,16 @@ class PepperService(object):
         self.active_subscriptions.clear()
 
 if __name__ == "__main__":
-    import stk.runner
-    stk.runner.run_service(PepperService)
+    try:
+        # Initialiser l'application Qi
+        qiapp = qi.Application(["PepperService", "--qi-url=tcp://10.50.90.104:9559"])
+        qiapp.start()
+        # Initialiser le service
+        pepper_service = PepperService(qiapp)
+        qiapp.session.registerService(PepperService.APP_ID, pepper_service)
+        print("Service Pepper démarré.")
+        qiapp.run()  # Lancer la boucle principale
+    except KeyboardInterrupt:
+        print("Interruption utilisateur, arrêt du service.")
+    except Exception as e:
+        print("Erreur lors de l'exécution du service :", e)

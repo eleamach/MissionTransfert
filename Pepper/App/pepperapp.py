@@ -14,7 +14,7 @@ def main():
         app = qi.Application(["PepperRun", "--qi-url={}".format(connection_url)])
         app.start()
         session = app.session
-        pepper_service = session.service("PepperService")
+        pepper_service = session.service("com.elea.pepperservice")
         
         
         # Initialisation du service MQTT avec la fonction callback pour les commandes reçues
@@ -110,13 +110,13 @@ def cmd_receive(cmd, pepper_service, is_started, mqtt_service):
 # Partie 1 : Introduction
 def partie_1(pepper_service):
     pepper_service.play_music("/home/nao/.local/share/PackageManager/apps/elea/robot.mp3")
-    """pepper_service.speak_n_animate(0, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)
+    pepper_service.speak_n_animate(0, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)
     pepper_service.speak_n_animate(1, "intro", "animations/Stand/Gestures/Hey_6", False, False)
     pepper_service.speak_n_animate(2, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)
     pepper_service.speak_n_animate(3, "intro", "animations/Stand/Reactions/TouchHead_4", False, False)
     pepper_service.speak_n_animate(6, "intro", "animations/Stand/Emotions/Positive/Laugh_2", False, False)
     pepper_service.speak_n_animate(4, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)
-    pepper_service.speak_n_animate(5, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)"""
+    pepper_service.speak_n_animate(5, "intro", "animations/Stand/BodyTalk/Listening/Listening_1", False, False)
     pepper_service.raise_event("SimpleWeb/Page/Progress0", 1)
 
 # Partie 2 : Premier lot "Capteurs"
