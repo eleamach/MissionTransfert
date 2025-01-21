@@ -1,7 +1,8 @@
 import cv2
 import face_recognition
 import os
-from collections import deque
+import time
+import paho.mqtt.client as mqtt
 
 # Charger plusieurs images de la personne connue
 known_encodings = []
@@ -24,8 +25,66 @@ if not cap.isOpened():
     print("Impossible d'ouvrir le flux vidéo")
     exit()
 
-# Définir une file pour mémoriser les dernières détections
-detection_history = deque(maxlen=5)  # Mémorise les 5 dernières frames
+# Variables pour le chronomètre et la détection
+start_time = None
+required_name = "Raphael"  # La personne spécifique à détecter
+time_threshold = 5  # Temps à maintenir (en secondes)
+game_won = False  # Indique si le jeu est gagné
+reset_requested = False  # Indique si une réinitialisation est en attente
+
+# MQTT Configuration
+BROKER = "134.214.51.148"
+PORT = 1883
+STATUS_TOPIC = "/detection/visage/status"
+CMD_TOPIC = "/detection/visage/cmd"
+
+# Initialiser le client MQTT
+client = mqtt.Client()
+
+def on_message(client, userdata, msg):
+    """Callback pour traiter les messages MQTT reçus."""
+    global game_won, start_time, reset_requested
+    topic = msg.topic
+    payload = msg.payload.decode()
+
+    print(f"[MQTT] Reçu sur {topic}: {payload}")
+
+    if topic == CMD_TOPIC and payload.lower() == "reset":
+        print("[INFO] Réinitialisation demandée via MQTT.")
+        reset_requested = True  # Activer le flag de réinitialisation
+
+def reset_game():
+    """Réinitialise le jeu et ses variables."""
+    global game_won, start_time, reset_requested
+    game_won = False
+    start_time = None
+    reset_requested = False
+    print("[INFO] Jeu réinitialisé.")
+    # Afficher l'état "waiting" via MQTT
+    client.publish(STATUS_TOPIC, "waiting")
+    print("[MQTT] Message 'waiting' envoyé.")
+
+def draw_1_on_frame(frame):
+    """Dessine un '1' rose sur l'image."""
+    h, w, _ = frame.shape
+    color = (255, 0, 255)  # Rose (BGR format)
+    thickness = 5
+
+    # Définir les coordonnées des lignes pour former un "1"
+    vertical_line = [(w // 2, h // 4), (w // 2, 3 * h // 4)]
+    base_line = [(w // 2 - 20, 3 * h // 4), (w // 2 + 20, 3 * h // 4)]
+    diagonal_line = [(w // 2, h // 4), (w // 2 - 20, h // 4 + 20)]  # Ligne diagonale
+
+    # Dessiner les lignes
+    cv2.line(frame, vertical_line[0], vertical_line[1], color, thickness)  # Ligne verticale
+    cv2.line(frame, base_line[0], base_line[1], color, thickness)  # Ligne horizontale en bas
+    cv2.line(frame, diagonal_line[0], diagonal_line[1], color, thickness)  # Ligne diagonale
+
+# Connexion au broker MQTT
+client.on_message = on_message
+client.connect(BROKER, PORT)
+client.subscribe(CMD_TOPIC)
+client.loop_start()
 
 while True:
     ret, frame = cap.read()
@@ -33,51 +92,62 @@ while True:
         print("Erreur de réception d'image")
         break
 
+    # Vérifier si un reset est demandé
+    if reset_requested:
+        reset_game()
+        continue
+
+    if game_won:
+        # Afficher un "1" rose sur l'écran
+        draw_1_on_frame(frame)
+        cv2.imshow("Flux vidéo", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+        continue
+
     # Convertir l'image pour `face_recognition`
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     face_locations = face_recognition.face_locations(rgb_frame)
     face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
-    # Stocker les détections actuelles
-    frame_detections = []
-
     # Vérifier si des visages correspondent à ceux connus
-    for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+    detected_name = None
+    for face_encoding in face_encodings:
         matches = face_recognition.compare_faces(known_encodings, face_encoding)
-        name = "Inconnu"
-
-        # Si une correspondance est trouvée, récupérer le nom
         if True in matches:
             first_match_index = matches.index(True)
-            name = known_names[first_match_index]
+            detected_name = known_names[first_match_index]
+            break
 
-        frame_detections.append((name, (top, right, bottom, left)))
+    # Gestion du chronomètre
+    if detected_name == required_name:
+        if start_time is None:
+            start_time = time.time()  # Démarrer le chronomètre
+        elapsed_time = time.time() - start_time
 
-    # Ajouter les détections de la frame à la file
-    detection_history.append(frame_detections)
+        # Afficher le chronomètre
+        cv2.putText(frame, f"Temps: {elapsed_time:.1f} s", (10, 50),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-    # Calculer la moyenne des détections sur les frames récentes
-    aggregated_detections = {}
-    for history_frame in detection_history:
-        for name, bbox in history_frame:
-            if name not in aggregated_detections:
-                aggregated_detections[name] = []
-            aggregated_detections[name].append(bbox)
+        # Vérifier la victoire
+        if elapsed_time >= time_threshold:
+            game_won = True
+            start_time = None  # Réinitialiser le chronomètre
+            # Envoyer "finish" via MQTT
+            client.publish(STATUS_TOPIC, "finish")
+            print("[MQTT] Message 'finish' envoyé.")
+            continue
+    else:
+        start_time = None  # Réinitialiser si la bonne personne n'est pas détectée
 
-    # Afficher les détections moyennées sur l'image actuelle
-    for name, bboxes in aggregated_detections.items():
-        # Moyenne des coordonnées des boîtes englobantes
-        avg_top = int(sum(bbox[0] for bbox in bboxes) / len(bboxes))
-        avg_right = int(sum(bbox[1] for bbox in bboxes) / len(bboxes))
-        avg_bottom = int(sum(bbox[2] for bbox in bboxes) / len(bboxes))
-        avg_left = int(sum(bbox[3] for bbox in bboxes) / len(bboxes))
-
-        # Définir la couleur selon le nom
-        color = (0, 255, 0) if name == "Raphael" else (0, 0, 255)
-
-        # Dessiner la boîte englobante et le nom
-        cv2.rectangle(frame, (avg_left, avg_top), (avg_right, avg_bottom), color, 2)
-        cv2.putText(frame, name, (avg_left, avg_top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+        if detected_name:
+            # Si une autre personne est détectée
+            cv2.putText(frame, f"Personne incorrecte: {detected_name}", (10, 50),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        else:
+            # Aucun visage détecté
+            cv2.putText(frame, "Personne non detectee!", (10, 50),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
     # Afficher le flux vidéo
     cv2.imshow("Flux vidéo", frame)
@@ -88,3 +158,4 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+client.loop_stop()
