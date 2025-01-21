@@ -25,8 +25,8 @@
                 <span class="percentage">0%</span>
             </div>
         </div>
-        <span id="clock">88:88</span>
-        <button class="custom-button">J'ai trouvé le code !</button>
+        <span class="clock">88:88</span>
+        <button id="code_button_capteur" class="custom-button" style="display:none;">J'ai trouvé le code !</button>
     </div>
 
     <!-- Page 33% -->
@@ -37,8 +37,8 @@
                 <span class="percentage">33%</span>
             </div>
         </div>
-        <span id="clock">88:88</span>
-        <button class="custom-button">J'ai trouvé le code !</button>
+        <span class="clock">88:88</span>
+        <button id="code_button_detection" class="custom-button" style="display:none;">J'ai trouvé le code !</button>
     </div>
 
     <!-- Page 66% -->
@@ -49,8 +49,8 @@
                 <span class="percentage">66%</span>
             </div>
         </div>
-        <span id="clock">88:88</span>
-        <button class="custom-button">J'ai trouvé le code !</button>
+        <span class="clock">88:88</span>
+        <button id="code_button_ia" class="custom-button" style="display:none;">J'ai trouvé le code !</button>
     </div>
 
     <!-- Page 99% -->
@@ -61,8 +61,8 @@
                 <span class="percentage">99%</span>
             </div>
         </div>
-        <span id="clock">88:88</span>
-        <button class="custom-button">J'ai trouvé le code !</button>
+        <span class="clock">88:88</span>
+        <button id="code_button" class="custom-button" style="display:none;">J'ai trouvé le code !</button>
     </div>
 
     <!-- Page code -->
@@ -95,12 +95,12 @@
                 <button id="validate-btn" onclick="validateCode()">Valider</button>
             </div>
         </div>
-        <span id="clock">88:88</span>
+        <span class="clock">88:88</span>
     </div> 
 
     <!-- Page bouton -->
      <div id="section_bouton" class="section">
-        <button class="final-button" onclick="validatefinalcode()">Lancer le transfert ?</button>
+        <button class = "final-button"onclick="validatefinalcode()">Lancer le transfert ?</button>
     </div>
     
     <!-- Page réussi -->
@@ -115,8 +115,7 @@
         <div class="box"></div>
     </div>
 
-    <script>
-        // Variables pour la validation des codes
+    <script>        
         var capteurValidated = false;  
         var detectionValidated = false; 
         var iaValidated = false; 
@@ -141,7 +140,6 @@
             digitElement.textContent = currentDigit;
         }
     
-        // Permet de valider le code
         function validateCode() {
             var code = '';
             for (var i = 0; i < 4; i++) {
@@ -149,23 +147,24 @@
             }
             code = code.trim();  
             console.log("Code saisi :", code);
+        
             if (code === correctCodes["Capteur"] && !capteurValidated) {
                 alert("Code correct !");
                 capteurValidated = true;  
-                raise("SimpleWeb/Page/CodeCorrectCapteur", true); 
+                emitEvent("Capteur"); // Appel à la fonction d'émission d'événement
             } else if (code === correctCodes["Detection"] && capteurValidated && !detectionValidated) {
                 alert("Code correct pour Détection !");
                 detectionValidated = true;  
-                raise("SimpleWeb/Page/CodeCorrectDetection", true); 
+                emitEvent("Detection");
             } else if (code === correctCodes["IA"] && capteurValidated && detectionValidated && !iaValidated) {
                 alert("Code correct pour IA !");
                 iaValidated = true;  
-                raise("SimpleWeb/Page/CodeCorrectIA", true); 
+                emitEvent("IA");
             } else {
                 alert("Code incorrect ou déjà validé. Réessayez.");
-                raise("SimpleWeb/Page/Final", true);
             }
         }
+        
         loadjson();
         
         // Permet de valider le code final
@@ -173,11 +172,13 @@
             alert("Vous êtes sûr ?");
             alert("C'est votre dernier mot ?");
             alert("Vous allez me tuer comme ça ?");
-            alert("Je comprends, la vie d'un robot t'importe peu...");
-            alert("Adieu");
+            alert("Je comprends, la vie d'un robot vous importe peu...");
+            alert("Adieu.");
             alert("Transfert en cours...");
-            finalcodeValidated = true;
+            emitEvent("Final");
         }
+
     </script>
 </body>
 </html>
+
