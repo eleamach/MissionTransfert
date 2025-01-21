@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MISSION TRANSFERT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .progress {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-height: 200px;
+            position: relative;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content {
+            margin-top: 15px;
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .regenerate-btn {
+            background-color: #2196F3;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .regenerate-btn:hover {
+            background-color: #1976D2;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 15px;
+        }
+
+        .correct {
+            color: #4CAF50;
+        }
+
+        .incorrect {
+            color: #f44336;
+        }
+
+        .record-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f44336;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .record-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .record-button .icon {
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .record-button.recording {
+            animation: pulse 2s infinite;
+            background-color: #d32f2f;
+        }
+
+        .record-button.recording .icon {
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 2px;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(244, 67, 54, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
+            }
+        }
+
+        .record-status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 100px;
+            height: 100px;
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            position: absolute;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading .loading-spinner {
+            display: block;
+        }
+
+        .loading .icon {
+            opacity: 0.5;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+        }
+
+        .card-loading.active {
+            display: flex;
+        }
+
+        .card-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            animation: spin 1s linear infinite;
+        }
+
+        .final-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            max-width: 800px;
+            white-space: pre-line;
+            display: none;  /* Caché par défaut */
+        }
+
+        .grid-container.hidden {
+            display: none;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1></h1>
+    </div>
+
+    <div class="progress" id="progressContainer">
+        Énigmes résolues : <span id="progress">0</span>/5
+    </div>
+
+    <div class="grid-container" id="gridContainer">
+        <div class="card">
+            <div class="card-loading">
+                <div class="card-loading-spinner"></div>
+            </div>
+            <h2>
+                Énigme actuelle
+                <button class="regenerate-btn" onclick="regenerateEnigme()">🔄</button>
+            </h2>
+            <div class="content" id="enigme">{{ enigme }}</div>
+        </div>
+
+        <div class="card">
+            <div class="card-loading">
+                <div class="card-loading-spinner"></div>
+            </div>
+            <h2>Votre réponse</h2>
+            <div class="content" id="transcript">
+                <em>Votre réponse apparaîtra ici...</em>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-loading">
+                <div class="card-loading-spinner"></div>
+            </div>
+            <h2>Évaluation</h2>
+            <div class="content" id="evaluation">
+                <em>L'évaluation apparaîtra ici...</em>
+            </div>
+        </div>
+    </div>
+
+    <div class="final-card" id="finalCard">
+        <div class="content" id="finalEnigme"></div>
+    </div>
+
+    <div class="controls">
+        <button id="recordButton" class="record-button" onclick="toggleRecording()">
+            <div class="loading-spinner"></div>
+            <div class="icon"></div>
+        </button>
+        <div class="record-status" id="recordStatus">Cliquez pour enregistrer</div>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+
+        // Connexion WebSocket
+        const socket = io();
+
+        // Écouter l'événement de reset
+        socket.on('reset_app', () => {
+            // Réinitialiser l'interface
+            document.getElementById('gridContainer').classList.remove('hidden');
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('finalCard').style.display = 'none';
+            document.querySelector('.controls').style.display = 'flex';
+            
+            // Réinitialiser les compteurs et contenus
+            document.getElementById('progress').textContent = '0';
+            document.getElementById('transcript').innerHTML = "<em>Votre réponse apparaîtra ici...</em>";
+            document.getElementById('evaluation').innerHTML = "<em>L'évaluation apparaîtra ici...</em>";
+            
+            // Recharger la page pour réinitialiser la session
+            window.location.reload();
+        });
+
+        async function setupRecorder() {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const formData = new FormData();
+                formData.append('audio', audioBlob);
+
+                try {
+                    const response = await fetch('/record', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        document.getElementById('transcript').textContent = data.transcript;
+                        document.getElementById('progress').textContent = data.enigmes_resolues;
+                        
+                        if (data.phase === 'finale') {
+                            // Cacher la grille et la barre de progression
+                            document.getElementById('gridContainer').classList.add('hidden');
+                            document.getElementById('progressContainer').style.display = 'none';
+                            
+                            // Afficher l'énigme finale
+                            const finalCard = document.getElementById('finalCard');
+                            finalCard.style.display = 'block';
+                            document.getElementById('finalEnigme').textContent = data.final_enigme;
+
+                            // Si l'énigme finale est résolue
+                            if (data.is_correct) {
+                                // Cacher le bouton d'enregistrement et le statut
+                                document.querySelector('.controls').style.display = 'none';
+                            }
+                        } else {
+                            // Gestion normale des énigmes
+                            document.getElementById('evaluation').textContent = data.message;
+                            if (data.is_correct && data.next_enigme) {
+                                document.getElementById('enigme').textContent = data.next_enigme;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    document.getElementById('evaluation').textContent = 'Erreur: ' + error;
+                } finally {
+                    document.querySelectorAll('.card-loading').forEach(loader => {
+                        loader.classList.remove('active');
+                    });
+                    document.getElementById('recordButton').classList.remove('loading');
+                    document.getElementById('recordStatus').textContent = 'Cliquez pour enregistrer';
+                    audioChunks = [];
+                }
+            };
+        }
+
+        async function toggleRecording() {
+            const button = document.getElementById('recordButton');
+            const status = document.getElementById('recordStatus');
+
+            if (!mediaRecorder) {
+                button.classList.add('loading');
+                status.textContent = 'Initialisation...';
+                await setupRecorder();
+                button.classList.remove('loading');
+            }
+
+            if (!isRecording) {
+                mediaRecorder.start();
+                isRecording = true;
+                button.classList.add('recording');
+                status.textContent = 'Enregistrement en cours... Cliquez pour arrêter';
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                button.classList.remove('recording');
+                button.classList.add('loading');
+                status.textContent = 'Traitement en cours...';
+                
+                // Afficher les spinners de chargement dans les cartes
+                document.querySelectorAll('.card-loading').forEach(loader => {
+                    loader.classList.add('active');
+                });
+            }
+        }
+
+        function regenerateEnigme() {
+            fetch('/regenerate_enigme', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('enigme').textContent = data.nouvelle_enigme;
+                    document.getElementById('transcript').innerHTML = "<em>Votre réponse apparaîtra ici...</em>";
+                    document.getElementById('evaluation').innerHTML = "<em>L'évaluation apparaîtra ici...</em>";
+                }
+            })
+            .catch(error => {
+                document.getElementById('evaluation').textContent = 'Erreur: ' + error;
+            });
+        }
+    </script>
+</body>
+</html>
