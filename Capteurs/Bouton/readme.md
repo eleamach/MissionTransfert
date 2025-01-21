@@ -1,89 +1,70 @@
-# 🎮 Jeu Simon
 
-Ce projet implémente un jeu de mémoire interactif basé sur le célèbre jeu **Simon**, en utilisant un pad LED, un système audio et une communication via MQTT pour suivre et réinitialiser l'état du jeu. Le joueur doit reproduire des séquences de couleurs et de sons générées aléatoirement pour progresser dans le jeu.
+# 🔧 Projet : Contrôle via 4 Boutons avec MQTT
 
----
+Ce projet vise à créer un système de 4 boutons connectés, chacun capable de communiquer son état via le protocole MQTT. Une fois tous les boutons appuyés simultanément, un message "finish" est envoyé à Home Assistant. Ce dernier peut également envoyer une commande "reset" pour réinitialiser l'état du système.
+
+--- 
 
 ## 📜 Description du projet
 
-Le jeu consiste à :
-1. Générer des séquences aléatoires de LEDs (avec des couleurs et des sons associés).
-2. Permettre au joueur de reproduire ces séquences en appuyant sur les boutons correspondants.
-3. Passer au niveau suivant lorsque la séquence est correctement reproduite.
-4. Afficher le chiffre "1" en LED et envoyer un message MQTT **finish** lorsque tous les niveaux sont complétés.
+Le projet se compose de :
 
-Le jeu inclut :
-- Gestion des LEDs pour afficher des séquences et le progrès.
-- Génération de sons correspondant aux LEDs.
-- Gestion des niveaux, avec une difficulté croissante.
-- Communication avec un serveur MQTT pour signaler l'état du jeu et écouter des commandes.
+- **4 boutons physiques** connectés à des ESP32, chacun communiquant avec un broker MQTT pour indiquer son état ("pressed" ou "released").
+- **Un script Python central** pour gérer les états des boutons, évaluer si tous les boutons sont appuyés, et envoyer un message "finish" lorsque les conditions sont remplies.
+- **Home Assistant** pour envoyer la commande "reset" au système et recevoir les mises à jour d'état.
 
 ---
 
-## 🔧 Fonctionnalités principales
+## 🛠️ Fonctionnalités principales
 
-1. **Jeu Simon classique** :
-   - Affichage de séquences lumineuses sur un pad LED 4x4.
-   - Génération de sons correspondant à chaque LED.
+1. **Communication MQTT** :
+   - Chaque bouton publie son état (à travers un ESP32) sur un topic unique.
+   - Le script Python central souscrit à tous les topics pour surveiller les états des boutons.
+   - Home Assistant peut envoyer une commande "reset" sur un topic dédié.
 
-2. **Gestion des niveaux** :
-   - Niveau 1 : Séquences de 5 étapes.
-   - Niveau 2 : Séquences de 8 étapes.
-   - Niveau 3 : Séquences de 10 étapes.
-   - Affichage progressif des niveaux via des LEDs.
+2. **Gestion des états des boutons** :
+   - Les états des boutons sont suivis en temps réel par le script Python.
+   - Lorsque tous les boutons sont appuyés simultanément, un message "finish" est publié.
 
-3. **État de fin de jeu** :
-   - Une fois les 3 niveaux complétés :
-     - Les LEDs affichent en permanence un chiffre "1".
-     - Un message MQTT **finish** est envoyé.
-
-4. **Communication MQTT** :
-   - Envoi de l'état du jeu via MQTT :
-     - **waiting** : Le jeu est prêt à démarrer.
-     - **finish** : Tous les niveaux ont été complétés.
-   - Réception de la commande MQTT **reset** pour réinitialiser le jeu.
+3. **Réinitialisation du système** :
+   - Une commande "reset" de Home Assistant réinitialise les états des boutons.
 
 ---
 
-## 🔧 Architecture technique
+## 🛠️ Architecture technique
 
-### 🔍 Structure globale du projet
+### 📂 Structure globale du projet
 
 ```plaintext
 .
-├── Simon/
-│   ├── Simon.ino         # Code principal du jeu Simon
-│   └── README.md             # Documentation du projet
+├── button1/
+│   ├── button1.ino            # Code ESP32 pour le bouton 1
+├── button2/
+│   ├── button2.ino            # Code ESP32 pour le bouton 2
+├── button3/
+│   ├── button3.ino            # Code ESP32 pour le bouton 3
+├── buttonLCD/
+│   ├── buttonLCD.ino          # Code ESP32 pour le bouton 4 (LCD inclus)
+├── python/
+│   ├── main.py                # Script Python central pour la gestion des boutons
+└── README.md                  # Documentation du projet
+
 ```
 
 ---
 
 ## 🖥️ Technologies utilisées
 
-### Matériel
-- **ESP32** : Microcontrôleur pour piloter le pad LED et la communication MQTT.
-- **Pad LED 4x4** : Pour afficher les séquences et le chiffre "1".
-- **Système audio** : Génération de sons associés aux LEDs.
-- **LEDs de progression** : Indiquent les niveaux complétés.
 
-### Logiciel
-- **Arduino IDE** : Développement et déploiement du code.
-- **Protocole MQTT** :
-  - **PubSubClient** : Librairie utilisée pour la communication MQTT.
-- **SPI** : Pour la communication avec le pad LED.
+### Côté ESP32
+- **Arduino IDE** : Pour programmer les ESP32.
+- **WiFi** : Connexion des ESP32 au réseau.
+- **PubSubClient** : Librairie pour gérer la communication MQTT.
 
----
-
-## 📡 MQTT : Communication entre le jeu et les autres systèmes
-
-### Topics MQTT
-- **Publication** :
-  - `/capteur/simon/status` :
-    - **waiting** : En attente de début ou après réinitialisation.
-    - **finish** : Signal que tous les niveaux ont été complétés.
-- **Souscription** :
-  - `/capteur/simon/cmd` :
-    - **reset** : Réinitialisation du jeu.
+### Côté serveur
+- **Python 3** : Langage pour le script central.
+- **paho-mqtt** : Librairie Python pour communiquer via MQTT.
+- **Home Assistant** : Pour envoyer la commande "reset" et surveiller les états.
 
 ---
 
@@ -91,24 +72,55 @@ Le jeu inclut :
 
 ### 1. Pré-requis
 
+- **Broker MQTT** : Installez un broker MQTT tel que Mosquitto. Configurez-le pour être accessible par les ESP32 et le script Python.
 - **ESP32** :
-  - Configuré pour le réseau Wi-Fi **RobotiqueCPE**.
-- **Broker MQTT** :
-  - Disponible à l'adresse `134.214.51.148` sur le port `1883`.
-- **Arduino IDE** :
-  - Installez les librairies nécessaires :
-    - **PubSubClient**
-    - **SPI**
+  - Connectez chaque ESP32 à votre réseau WiFi.
+  - Chargez le code approprié (à partir des dossiers `button1/`, `button2/`, etc.) dans chaque ESP32.
+- **Python** :
+  - Installez Python 3 sur votre machine.
+  - Installez la librairie `paho-mqtt` :
+    ```bash
+    pip install paho-mqtt
+    ```
 
-### 2. Déploiement
+### 2. Configuration
 
-1. **Téléversez le code** :
-   - Configurez les paramètres Wi-Fi et MQTT dans le code.
-   - Compilez et téléversez le fichier `.ino` sur l'ESP32.
+#### ESP32
 
-2. **Exécutez le jeu** :
-   - Alimentez l'ESP32 et attendez la connexion Wi-Fi.
-   - Une séquence aléatoire s'affichera. Suivez-la pour progresser.
+Dans chaque fichier `.ino`, configurez les informations suivantes :
 
-3. **Réinitialisation** :
-   - Envoyez la commande MQTT **reset** pour recommencer le jeu.
+- **SSID** et **mot de passe** de votre réseau WiFi :
+  ```cpp
+  const char* ssid = "RobotiqueCPE";
+  const char* password = "AppareilLunaire:DauphinRadio";
+  ```
+
+- **Adresse du broker MQTT** :
+  ```cpp
+  const char* mqtt_server = "AdresseIPDuBroker";
+  ```
+
+#### Script Python
+
+Dans `main.py`, configurez les informations suivantes :
+
+- **Adresse du broker MQTT** :
+  ```python
+  BROKER = "AdresseIPDuBroker"
+  PORT = 1883
+  ```
+
+### 3. Exécution
+
+#### Côté ESP32
+
+1. Connectez chaque ESP32 à votre ordinateur.
+2. Chargez le code correspondant dans l'ESP32.
+3. Redémarrez les ESP32 et assurez-vous qu'ils se connectent au WiFi et au broker MQTT.
+
+#### Côté serveur
+ Lancez le script Python :
+   ```bash
+   python3 button_monitor_mqtt.py
+   ```
+
