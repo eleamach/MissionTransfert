@@ -19,12 +19,6 @@ def debug_button_states():
         print(f"  {topic}: {state}")
     print("-" * 40)
 
-# Gestion de la commande reset
-def handle_reset_command(client):
-    print("[INFO] Commande 'reset' reçue. Mise à jour de l'état de l'atelier.")
-    # Envoie du message "waiting" pour signaler que l'atelier est en attente
-    client.publish(STATUS_TOPIC, "waiting")
-    print("[INFO] Message 'waiting' envoyé.")
 
 # Callback pour la réception des messages
 def on_message(client, userdata, msg):
@@ -46,11 +40,6 @@ def on_message(client, userdata, msg):
         if all(state == "pressed" for state in button_states.values()):
             print("[INFO] Tous les boutons sont pressés. Envoi de 'finish'.")
             client.publish(STATUS_TOPIC, "finish")
-
-    elif topic == CMD_TOPIC:
-        # Vérifie si le message est "reset"
-        if payload.lower() == "reset":
-            handle_reset_command(client)
 
 # Configuration MQTT
 client = mqtt.Client()

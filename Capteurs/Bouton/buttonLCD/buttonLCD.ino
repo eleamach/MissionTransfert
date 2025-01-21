@@ -8,6 +8,7 @@ const char* password = "AppareilLunaire:DauphinRadio";
 const char* mqtt_server = "134.214.51.148";
 const char* topic = "/capteur/bouton/etat4LCD"; // Topic unique pour ce bouton
 const char* finishTopic = "/capteur/bouton/status"; // Topic pour l'état "finish"
+const char* resetTopic = "/capteur/bouton/cmd"; // Topic pour l'état "reset"
 
 // Définition du bouton
 const int buttonPin = 21; // GPIO pour le bouton
@@ -25,6 +26,7 @@ void connectMQTT() {
     if (client.connect("Bouton4")) {
       Serial.println("Connecté au broker MQTT !");
       client.subscribe(finishTopic); // S'abonner au topic "finish"
+      client.subscribe(resetTopic); // S'abonner au topic "cmd"
     } else {
       Serial.print("Échec de connexion, état MQTT : ");
       Serial.println(client.state());
@@ -48,7 +50,13 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Texte jaune sur fond noir
     tft.setTextSize(5);        // Taille du texte
     tft.setCursor(50, 50);     // Positionne le texte au centre
-    tft.print("4");            // Affiche "4"
+    tft.print("8");            // Affiche "8"
+  }
+  if (String(topic) == resetTopic && message == "reset") {
+    tft.fillScreen(TFT_BLACK); // Efface l'écran
+    // Publier l'état du bouton
+    String message = "waiting";
+    client.publish(finishTopic, message.c_str());
   }
 }
 
@@ -59,6 +67,8 @@ void setup() {
   tft.init();
   tft.setRotation(1); // Configure l'orientation de l'écran
   tft.fillScreen(TFT_BLACK); // Efface l'écran au démarrage
+
+  pinMode(buttonPin, INPUT_PULLUP);
 
   // Initialisation WiFi
   WiFi.begin(ssid, password);
