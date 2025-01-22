@@ -21,6 +21,11 @@ __pycache__/
 *.pyd
 *.egg-info/
 .eggs/
+*.python-version
+venv/
+env/
+ENV/
+.venv/
 
 # Temporary files
 *.tmp
