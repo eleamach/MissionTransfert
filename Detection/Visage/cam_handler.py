@@ -35,8 +35,8 @@ reset_requested = False  # Indique si une réinitialisation est en attente
 # MQTT Configuration
 BROKER = "134.214.51.148"
 PORT = 1883
-STATUS_TOPIC = "/detection/visage/status"
-CMD_TOPIC = "/detection/visage/cmd"
+STATUS_TOPIC = "/detection/photo/status"
+CMD_TOPIC = "/detection/photo/cmd"
 
 # Initialiser le client MQTT
 client = mqtt.Client()
