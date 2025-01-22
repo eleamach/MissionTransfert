@@ -8,7 +8,7 @@ const char* mqtt_server = "134.214.51.148";
 const char* topic = "/capteur/bouton/etat1"; // Topic unique pour ce bouton
 
 // Définition du bouton
-const int buttonPin = 20; // GPIO pour le bouton
+const int buttonPin = 21; // GPIO pour le bouton
 WiFiClient espClient;
 PubSubClient client(espClient);
 
