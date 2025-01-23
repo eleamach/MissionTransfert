@@ -8,13 +8,17 @@ L'objectif de ce lot est de configurer et d'intégrer des capteurs pour réalise
 - Une épreuves ToF
 - Utiliser un Simon
 - Appuyer sur des boutons dans l'escape game
+- Une phase de tutoriel
 
 
 ## Installation 
-
 
 Voir les étapes d'installation de l'épreuve associé:
 
 1. [ToF](./ToF/readme.md)
 1. [Simon](./Simon/readme.md)
-1. [Bouton](./Bouton/readme.md)
+1. [Bouton](./Bouton/readme.md)  
+
+
+## Vidéo de mise en place : 
+[Vidéo](https://youtu.be/-YmaQCYe-yo)
