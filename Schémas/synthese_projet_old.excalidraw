@@ -641,7 +641,7 @@
       "type": "text",
       "x": 214.12215242618652,
       "y": 470.94930891800425,
-      "width": 151.98333740234375,
+      "width": 136.05195751786232,
       "height": 35,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -656,8 +656,8 @@
       "index": "at",
       "roundness": null,
       "seed": 2052876103,
-      "version": 310,
-      "versionNonce": 529404563,
+      "version": 297,
+      "versionNonce": 1229886375,
       "isDeleted": false,
       "boundElements": [
         {
@@ -665,16 +665,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1737629548071,
+      "updated": 1733385717201,
       "link": null,
       "locked": false,
-      "text": "4) Tutoriel",
+      "text": "4) ? ? ? ?",
       "fontSize": 28,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "4) Tutoriel",
+      "originalText": "4) ? ? ? ?",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -683,7 +683,7 @@
       "type": "text",
       "x": 542.1671959125872,
       "y": 469.78102471255534,
-      "width": 306.2833333333333,
+      "width": 121.71595135331154,
       "height": 35,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -698,8 +698,8 @@
       "index": "au",
       "roundness": null,
       "seed": 876891655,
-      "version": 623,
-      "versionNonce": 1414448051,
+      "version": 553,
+      "versionNonce": 71112167,
       "isDeleted": false,
       "boundElements": [
         {
@@ -707,26 +707,26 @@
           "type": "arrow"
         }
       ],
-      "updated": 1737629577842,
+      "updated": 1733385717201,
       "link": null,
       "locked": false,
-      "text": "Modifier la luminositée",
+      "text": "? ? ? ? ?",
       "fontSize": 28,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Modifier la luminositée",
+      "originalText": "? ? ? ? ?",
       "autoResize": true,
       "lineHeight": 1.25
     },
     {
       "id": "VjPP5h_BJ4q9iXNymv0xM",
       "type": "arrow",
-      "x": 374.7261082208237,
-      "y": 487.69974632894156,
-      "width": 157.4616941720543,
-      "height": 2.75779545083833,
+      "x": 358.79472833634225,
+      "y": 487.93230067969625,
+      "width": 173.39307405653574,
+      "height": 3.9120290031970626,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -742,11 +742,11 @@
         "type": 2
       },
       "seed": 1220855687,
-      "version": 354,
-      "versionNonce": 532796755,
+      "version": 271,
+      "versionNonce": 1949046985,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1737629577844,
+      "updated": 1733385717202,
       "link": null,
       "locked": false,
       "points": [
@@ -755,8 +755,8 @@
           0
         ],
         [
-          157.4616941720543,
-          -2.75779545083833
+          173.39307405653574,
+          -3.9120290031970626
         ]
       ],
       "lastCommittedPoint": null,
@@ -1371,7 +1371,7 @@
       "type": "rectangle",
       "x": 550.0475771254864,
       "y": 608.0812545895271,
-      "width": 987.2351422637404,
+      "width": 970.0922851208833,
       "height": 447.6194432666887,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -1388,11 +1388,11 @@
         "type": 3
       },
       "seed": 142922407,
-      "version": 870,
-      "versionNonce": 1141407475,
+      "version": 858,
+      "versionNonce": 457641434,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1737629953196,
+      "updated": 1733386843571,
       "link": null,
       "locked": false
     },
@@ -1444,7 +1444,7 @@
       "x": 828.2851765226674,
       "y": 708.1481395261652,
       "width": 50.09536467771886,
-      "height": 0.5026614866351338,
+      "height": 0.502485379039058,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1460,11 +1460,11 @@
         "type": 2
       },
       "seed": 1142163977,
-      "version": 2415,
-      "versionNonce": 1944353885,
+      "version": 2396,
+      "versionNonce": 825508742,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1737629621548,
+      "updated": 1733386843846,
       "link": null,
       "locked": false,
       "points": [
@@ -1474,7 +1474,7 @@
         ],
         [
           50.09536467771886,
-          0.5026614866351338
+          0.502485379039058
         ]
       ],
       "lastCommittedPoint": null,
@@ -1499,7 +1499,7 @@
       "type": "text",
       "x": 887.5397936742675,
       "y": 680.0338891372232,
-      "width": 592.15,
+      "width": 592.3957270383835,
       "height": 70,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -1514,8 +1514,8 @@
       "index": "b0F",
       "roundness": null,
       "seed": 1526194409,
-      "version": 929,
-      "versionNonce": 11273213,
+      "version": 910,
+      "versionNonce": 2037141722,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1523,16 +1523,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1737629621547,
+      "updated": 1733386843571,
       "link": null,
       "locked": false,
-      "text": "Utilisation d'un micro et de hauts-parleurs\nafin de résoudre une énigme vocallement",
+      "text": "Utilisation d'un micro et de hauts-parleurs\nafin de résoudre une énigme vocal",
       "fontSize": 28,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Utilisation d'un micro et de hauts-parleurs\nafin de résoudre une énigme vocallement",
+      "originalText": "Utilisation d'un micro et de hauts-parleurs\nafin de résoudre une énigme vocal",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1582,8 +1582,8 @@
       "id": "QH-OhYN68FjAmTf6AF1_x",
       "type": "text",
       "x": 888.0700591275377,
-      "y": 776.8975631929939,
-      "width": 641.433349609375,
+      "y": 775.4689917644224,
+      "width": 536.03173828125,
       "height": 70,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -1598,8 +1598,8 @@
       "index": "b0H",
       "roundness": null,
       "seed": 1581349545,
-      "version": 1136,
-      "versionNonce": 1750757875,
+      "version": 1112,
+      "versionNonce": 894964698,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1607,16 +1607,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1737629771856,
+      "updated": 1733386843571,
       "link": null,
       "locked": false,
-      "text": "Utilisation d'un haut-parleur pour exprimer un \ntexte et trouver le nombre de mot",
+      "text": "Utilisation d'un micro pour exprimer un \ntexte et trouver le nombre de mot",
       "fontSize": 28,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Utilisation d'un haut-parleur pour exprimer un \ntexte et trouver le nombre de mot",
+      "originalText": "Utilisation d'un micro pour exprimer un \ntexte et trouver le nombre de mot",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1626,7 +1626,7 @@
       "x": 788.8520275582201,
       "y": 811.1664884409622,
       "width": 94.59106531624604,
-      "height": 0.23234805074969245,
+      "height": 0.10334590593527082,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1642,11 +1642,11 @@
         "type": 2
       },
       "seed": 2070822281,
-      "version": 1337,
-      "versionNonce": 180206483,
+      "version": 1314,
+      "versionNonce": 1227987462,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1737629771858,
+      "updated": 1733386843846,
       "link": null,
       "locked": false,
       "points": [
@@ -1656,7 +1656,7 @@
         ],
         [
           94.59106531624604,
-          0.23234805074969245
+          -0.10334590593527082
         ]
       ],
       "lastCommittedPoint": null,
@@ -1721,10 +1721,10 @@
     {
       "id": "M_Jv9ZH3XhOBQBLOYaBoh",
       "type": "text",
-      "x": 889.1395166631273,
-      "y": 866.5198453413868,
-      "width": 634.2666666666667,
-      "height": 105,
+      "x": 887.710945234556,
+      "y": 867.9484167699583,
+      "width": 617.8197021484375,
+      "height": 70,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1738,8 +1738,8 @@
       "index": "b0K",
       "roundness": null,
       "seed": 1191259977,
-      "version": 1469,
-      "versionNonce": 503039763,
+      "version": 1324,
+      "versionNonce": 1807395270,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1747,16 +1747,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1737629957267,
+      "updated": 1733386898995,
       "link": null,
       "locked": false,
-      "text": "Utilisation d'un générateur d'image\n(Stable Diffusion + ControlNET) pour trouver\n des informations cachées",
+      "text": "Utilisation d'un générateur d'image (DALL-E,\n GPT...) et trouver la vraie photo",
       "fontSize": 28,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Utilisation d'un générateur d'image\n(Stable Diffusion + ControlNET) pour trouver\n des informations cachées",
+      "originalText": "Utilisation d'un générateur d'image (DALL-E,\n GPT...) et trouver la vraie photo",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1765,8 +1765,8 @@
       "type": "arrow",
       "x": 800.6977164582362,
       "y": 904.4254528237786,
-      "width": 80.60643479094995,
-      "height": 2.7956473798408297,
+      "width": 79.17786336237862,
+      "height": 0.35588683260209564,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1782,11 +1782,11 @@
         "type": 2
       },
       "seed": 1737383465,
-      "version": 1509,
-      "versionNonce": 1740074163,
+      "version": 1361,
+      "versionNonce": 999129350,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1737629957269,
+      "updated": 1733386898996,
       "link": null,
       "locked": false,
       "points": [
@@ -1795,8 +1795,8 @@
           0
         ],
         [
-          80.60643479094995,
-          2.7956473798408297
+          79.17786336237862,
+          -0.35588683260209564
         ]
       ],
       "lastCommittedPoint": null,
@@ -1819,8 +1819,8 @@
     {
       "id": "V5dPGUQo856ucFqyyeedE",
       "type": "text",
-      "x": 571.7390539974423,
-      "y": 985.5411523030668,
+      "x": 570.3104825688708,
+      "y": 978.3982951602097,
       "width": 198.84742736816406,
       "height": 35.80916912505268,
       "angle": 0,
@@ -1836,8 +1836,8 @@
       "index": "b0M",
       "roundness": null,
       "seed": 542290185,
-      "version": 1011,
-      "versionNonce": 992357309,
+      "version": 1004,
+      "versionNonce": 159586778,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1845,7 +1845,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1737629922320,
+      "updated": 1733386843571,
       "link": null,
       "locked": false,
       "text": "4) Labyrinthe ",
@@ -1861,8 +1861,8 @@
     {
       "id": "E0ngehMLsa9UYJ6iU5wp7",
       "type": "text",
-      "x": 886.4526529677373,
-      "y": 977.3097022541372,
+      "x": 887.8812243963087,
+      "y": 960.16684511128,
       "width": 439.79583740234375,
       "height": 70,
       "angle": 0,
@@ -1878,8 +1878,8 @@
       "index": "b0N",
       "roundness": null,
       "seed": 650749929,
-      "version": 1401,
-      "versionNonce": 1938143955,
+      "version": 1380,
+      "versionNonce": 1888873306,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1887,7 +1887,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1737629919083,
+      "updated": 1733386843571,
       "link": null,
       "locked": false,
       "text": "Jeu pour trouver le plus court \nchemin, utilisation de dijkstra",
@@ -1903,10 +1903,10 @@
     {
       "id": "ZXg_1gDMX9QGi8BJBntxr",
       "type": "arrow",
-      "x": 782.114261137218,
-      "y": 1000.9234731343068,
-      "width": 96.50302641657788,
-      "height": 0.9092338078907005,
+      "x": 780.6856897086466,
+      "y": 994.8931056462225,
+      "width": 99.36016927372066,
+      "height": 0.005274308669754646,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1922,11 +1922,11 @@
         "type": 2
       },
       "seed": 1962853065,
-      "version": 1529,
-      "versionNonce": 1116872829,
+      "version": 1488,
+      "versionNonce": 1929996038,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1737629923266,
+      "updated": 1733386843846,
       "link": null,
       "locked": false,
       "points": [
@@ -1935,8 +1935,8 @@
           0
         ],
         [
-          96.50302641657788,
-          -0.9092338078907005
+          99.36016927372066,
+          -0.005274308669754646
         ]
       ],
       "lastCommittedPoint": null,
@@ -1979,7 +1979,7 @@
       "version": 8,
       "versionNonce": 1001166534,
       "isDeleted": false,
-      "boundElements": [],
+      "boundElements": null,
       "updated": 1733387004028,
       "link": null,
       "locked": false,
@@ -2016,7 +2016,7 @@
       "version": 120,
       "versionNonce": 263619718,
       "isDeleted": false,
-      "boundElements": [],
+      "boundElements": null,
       "updated": 1733387006345,
       "link": null,
       "locked": false,
@@ -2053,7 +2053,7 @@
       "version": 236,
       "versionNonce": 1685736006,
       "isDeleted": false,
-      "boundElements": [],
+      "boundElements": null,
       "updated": 1733387008557,
       "link": null,
       "locked": false,
