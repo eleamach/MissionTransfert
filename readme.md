@@ -30,7 +30,15 @@ Pour installer et exécuter ce projet, veuillez suivre les instructions fournies
 ## Schémas
 ![Architecture du projet](Schémas/archi_projet.drawio.png)
 
-## Vidéos de présentation global
+## Vidéos de présentation global  
+
+Trailer :  
+[Vidéo](https://youtu.be/ZpT3Z1Spr-8)  
+
+Vidéo entière :    
+[Vidéo](https://youtu.be/r574sGesiL8)   
+
+
 
  
 
