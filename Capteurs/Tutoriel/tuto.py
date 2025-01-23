@@ -149,7 +149,7 @@ def restart_tutoriel():
 root = tk.Tk()
 root.title("Tutoriel de l'escape game")
 root.geometry("1920x1080")  # Dimension initiale de la fenêtre (plein écran)
-root.attributes('-fullscreen', False)  # Passer en plein écran
+root.attributes('-fullscreen', True)  # Passer en plein écran
 root.resizable(False, False)
 
 # Ajouter un message principal

@@ -11,8 +11,6 @@ Ce projet vise à créer un escape game autour de la robotique. Il est structur�
 ### Synthese
 ![Synthese projet](Schémas/synthese_projet.png)
 
-### Sprint 1 :
-![Issues Board](<Schémas/issues board.png>)
 
 ## Structure du projet
 
@@ -29,8 +27,19 @@ Le projet est divisé en plusieurs parties, chacune représentant un lot d'épre
 
 Pour installer et exécuter ce projet, veuillez suivre les instructions fournies dans les README des dossiers spécifiques.
 
+## Schémas
+![Architecture du projet](Schémas/archi_projet.drawio.png)
+
 ## Vidéos de présentation global
 
+ 
+
+## Vidéos de mise en place de l'escape game  
+
+Voir readme des lot d'atelier :
+- [Capteur](<./Capteurs/readme.md>) 
+- [Détéction](<./Detection/readme.md>) 
+- [IA](<./IA/readme.md>)
 
 
 ## Contact

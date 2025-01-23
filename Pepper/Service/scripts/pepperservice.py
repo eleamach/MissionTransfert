@@ -144,7 +144,7 @@ class PepperService(object):
                         self.tts.say("A quel atelier êtes-vous ? Si vous avez un doute sur le nom, regardez l'étiquette vers votre atelier") 
                         speech_recognition = self.session.service("ALSpeechRecognition")
                         speech_recognition.pause(True)
-                        workshops = ["Simon", "Mastermind", "Texte", "Tof", "Bouton", "Onsaitpas", "Visage", "Camera", "Emotion", "Reconnaissance", "Images", "Labyrinthe"] 
+                        workshops = ["Simon", "Mastermind", "Texte", "Tof", "Bouton", "Tutoriel", "Visage", "Camera", "Emotion", "Reconnaissance", "Images", "Labyrinthe"] 
                         speech_recognition.setVocabulary(workshops, False)
                         speech_recognition.pause(False)
                         workshop_recognition_subscriber = self.memory.subscriber("WordRecognized")
