@@ -8,7 +8,7 @@ L'objectif de ce lot est de configurer et d'intégrer la détéction pour réali
 - Détéction de personnes sur des caméras
 - Détéction de visage
 - Emotions
-- Mégamind
+- Mastermind
 
 ## Installation
 
@@ -18,3 +18,8 @@ Voir les étapes d'installation de l'épreuve associé:
 2. [Visages](./Visage/readme.md)
 3. [Emotions](./Emotions/readme.md)
 4. [Mastermind](./Mastermind/readme.md)
+
+
+
+## Vidéo de mise en place : 
+[Video](https://youtu.be/XAO8YeongF0)

@@ -43,7 +43,7 @@ session.service("ALMemory").done(function(ALMemory) {
             } else {
                 console.error("Aucun élément avec la classe 'clock' trouvé.");
             }
-        if (timeValue == "00:00") {
+        if (timeValue == "00:01") {
             session.service("ALMemory").done(function(ALMemory) {
                 ALMemory.raiseEvent("timeout", 1);
                 console.log("Événement Perdu émis");

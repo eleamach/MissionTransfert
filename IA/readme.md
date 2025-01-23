@@ -18,3 +18,8 @@ Voir les étapes d'installation de l'épreuve associé:
 2. [Génération texte](<./Génération texte/readme.md>)
 3. [Labyrinthe](./Labyrinthe/readme.md)
 4. [Reconnaissance vocale](<./Reconnaissance vocale/readme.md>)
+
+
+
+## Vidéo de mise en place : 
+[Vidéo](https://youtu.be/LcUoemF07_U)
