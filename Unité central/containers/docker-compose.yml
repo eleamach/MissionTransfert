@@ -1,0 +1,40 @@
+version: '3.7'
+
+# sudo docker compose up
+
+services:
+
+  homeassistant:
+    image: lscr.io/linuxserver/homeassistant
+    container_name: homeassistant
+    network_mode: host
+    environment:
+      - HOME
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - ${HOME}/docker_volumes/homeAssistant/data:/config:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    restart: unless-stopped
+    privileged: true
+
+
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto_broker
+    network_mode: host
+    environment:
+      - HOME
+    #user: 1000:1000
+    restart: always
+    # ports:
+    #   - "1883:1883"
+    #   - "9001:9001"
+    volumes:
+      - ${HOME}/docker_volumes/mosquitto/config:/mosquitto/config:rw
+      - ${HOME}/docker_volumes/mosquitto/data:/mosquitto/data:rw
+      - ${HOME}/docker_volumes/mosquitto/log:/mosquitto/log:rw  

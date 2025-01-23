@@ -9,3 +9,8 @@ L'objectif de cette partie est de configurer et d'intégrer Home Assistant pour 
 - Envoi de commande
 
 ## Installation
+Dézipper le dossier data dans son dossier local /docker_volumes/homeAssistant
+
+Nom : MISSION TRANSFERT
+Nom utilisateur : mission
+
