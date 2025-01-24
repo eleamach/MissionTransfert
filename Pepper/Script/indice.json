@@ -24,10 +24,10 @@
         "Il se pourrait qu'un écran soit assez proche d'un des boutons. Il indique des choses interessantes.",
         "4 boutons sont éparpillé dans la pièce. Il faut les trouver et les activer ensemble pour débloquer l'atelier suivant."
     ],
-    "Onsaitpas" : [
-        "",
-        "",
-        ""
+    "Tutoriel" : [
+        "Ce premier atelier est le tutoriel. Vous avez une carte avec un capteur de luminosité. Si vous mettez plus ou moins de lumière sur le capteur, vous verrez le pourcentage changer sur l'ecran.",
+        "Pour le premier défi, il serait interessant de cacher la lumière du capteur pour voir ce qu'il se passe.",
+        "Pour le second défi, il faudra trouver la bonne luminosité pour débloquer l'atelier suivant. Essayer d'ajuster vos mains au dessus du capteur pour atteindre 70%."
     ],
     "Camera" : [
         "Deux caméras sont disposées dans la pièce. Tu devrais faire attention aux nombre affiché sur l'ecran",
@@ -45,9 +45,9 @@
         "Le premier atelier consiste à reproduire l'emotion du smiley que vous avez trouvez sur une affiche dans la salle. Pour le deuxième atelier, vous devrez faire en même temps les émotions des couleurs associées. Et enfin, pour le troisème atelier, le texte vous donne des indices sur les émotions qu'il vous faut reproduire."
     ],
     "Reconnaissance" : [
-        "test",
-        "",
-        ""
+        "Si vous ne comprenez pas les énigmes, essayez de regénérer les énigmes. Vous trouverez peut-être la solution.",
+        "Les énigmes regénérés sont en fait pour le même mot. Peut être que des énigmes sont plus simples que les autres.",
+        "Les réponses sont : Ombre, la lettre N, un secret, le feu et rien."
     ],
     "Images"    : [
         "La salle de possède de jolies images. Mais quelque chose d'étrange se dégage de ces images, vous ne trouvez-pas ?",

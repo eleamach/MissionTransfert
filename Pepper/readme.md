@@ -1,12 +1,8 @@
 # 🔧 Pepper
 
-Ce projet vise à programmer un robot **Pepper** dans le cadre de Ce projet a pour objectif de programmer le robot Pepper dans le cadre d'un escape game interactif. Pepper agit à la fois comme maître du jeu et donneur d'indices, en combinant la communication via NAOqi et une interface web interactive disponible sur sa tablette.
+## 📜 Description de l'atelier
 
----
-
-## 📜 Description du projet
-
-Le but principal de ce projet est de permettre à Pepper d'interagir avec les utilisateurs à travers un jeu d'énigmes et de validation de codes, tout en gérant les signaux en temps réel. Le projet inclut :
+Le but principal de ce projet est de permettre à Pepper d'interagir avec les utilisateurs à travers un escape game, tout en gérant les signaux en temps réel. Le projet inclut :
 
 - Des scripts Python pour piloter Pepper.
 - Une interface web permettant aux joueurs de suivre les étapes du jeu et de rentrer des codes secrets.
@@ -83,7 +79,7 @@ Le but principal de ce projet est de permettre à Pepper d'interagir avec les ut
 ---
 
 ## 📡 MQTT : Communication entre le robot et les autres ateliers
-Le protocole MQTT (Message Queuing Telemetry Transport) est utilisé pour assurer la communication en temps réel entre Pepper et le reste des ateliers (et le controle via Home Assistant). MQTT permet de transmettre des messages de manière légère et efficace, ce qui est crucial pour un projet interactif tel qu'un escape game.
+Le protocole MQTT (Message Queuing Telemetry Transport) est utilisé pour assurer la communication en temps réel entre Pepper et le reste des ateliers (et le controle via Home Assistant). MQTT permet de transmettre des messages de manière légère et efficace, ce qui est crucial pour un projet interactif tel qu'un escape game. Le robot pepper attends un Start de la part de home assistant pour débuter l'escape game. Puis lorsqu'il reçoit un reset il recommence du début en attendant un start. Cette partie sera décrite côté Home Assistant.
 
 
 ## 🚀 Déploiement et utilisation
@@ -115,6 +111,25 @@ Le protocole MQTT (Message Queuing Telemetry Transport) est utilisé pour assure
 $ python2.7 pepperservice.py --qi-url "VOTRE_URL_DE_PEPPER"
 $ python2.7 pepperapp.py
 ```
+
+## 📂 Diagrammes
+**Schéma logiciel :**  
+
+![Schéma logiciel](Assets/Capture.PNG) 
+
+**Schéma logiciel :**  
+
+![Schéma ](Assets/Diagramme%20sans%20nom.jpg)
+
+## 🖥️ Captures d'écran
+
+### Robot 
+![Tablette](Assets/tablette.png)
+
+
+### Mise en route 
+[Vidéo de mise en route du robot PEPPER](https://youtu.be/T9yHQd0aRbA)
+
 
 ## 💡 Aide et Support
 Pour toute question ou problème, vous pouvez ouvrir une issue sur le dépôt GitLab ou me contacter par email : elea.machillot@cpe.fr
