@@ -28,12 +28,12 @@ Le projet est divisé en plusieurs parties, chacune représentant un lot d'épre
 Pour installer et exécuter ce projet, veuillez suivre les instructions fournies dans les README des dossiers spécifiques.
 
 ## Schémas
-![Architecture du projet](Schémas/archi_projet_fin.drawio.png)
+![Architecture du projet](Schémas/archi_projet_fin_fin.drawio.png)
 
 ## Vidéos de présentation global  
 
 Trailer :  
-[Vidéo](https://youtu.be/ZpT3Z1Spr-8)  
+[Vidéo](https://youtu.be/2cAScp28itE)  
 
 Vidéo entière :    
 [Vidéo](https://youtu.be/r574sGesiL8)   
