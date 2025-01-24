@@ -10,6 +10,7 @@ python game_master.py
 - `/capteur/bouton/cmd` : Commandes pour le workshop bouton
 - `/capteur/simon/cmd` : Commandes pour le workshop simon
 - `/capteur/tof/cmd` : Commandes pour le workshop tof
+- `/capteur/tutoriel/cmd` : Commandes pour le workshop tutoriel
 
 ### Lot "detection"
 - `/detection/bi-camera/cmd` : Commandes pour le workshop bi-camera
@@ -31,6 +32,7 @@ python game_master.py
 - `/capteur/bouton/status` : État du workshop bouton
 - `/capteur/simon/status` : État du workshop simon
 - `/capteur/tof/status` : État du workshop tof
+- `/capteur/tutoriel/status` : État du workshop tutoriel
 
 ### Lot "detection"
 - `/detection/bi-camera/status` : État du workshop bi-camera
@@ -70,7 +72,7 @@ python game_master.py
 
 #### Status du jeu (`/game/status`)
 - `waiting` : Workshop en attente
-- `in game` : lancement du timer
+- `in_game` : lancement du timer
 - `win` : Le jeu est gagner
 - `lose` : Le jeu est perdu
 

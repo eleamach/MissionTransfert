@@ -12,10 +12,6 @@ python -m venv venv_projet
 source venv_projet/bin/activate
 #installation des requirements du dossier Mastermind (à faire une fois avec le virtual env activé)
 pip install -r requirements.txt
-
-
-pip3 install paho-mqtt
-
 ```
 
 ### Prérequis
@@ -29,7 +25,11 @@ ls -l /dev/video*
 ```
 
 ### Étapes d'installation
-Dans le dossier [Mastermind](.) lancer la commande : ```bash python detection_emotions.py``` 
+Dans le dossier [Mastermind](.) lancer la commande : 
+```bash 
+python mastermind.py
+``` 
+
 
 ## Fonctionnalités
 
