@@ -37,9 +37,6 @@ Trailer :
 
 Vidéo entière :    
 [Vidéo](https://youtu.be/r574sGesiL8)   
-
-
-
  
 
 ## Vidéos de mise en place de l'escape game  
