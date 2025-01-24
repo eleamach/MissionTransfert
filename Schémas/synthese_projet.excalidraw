@@ -147,7 +147,7 @@
       "type": "text",
       "x": 1422.6928166510472,
       "y": 157.37337684969827,
-      "width": 134.81993103027344,
+      "width": 264.6558837890625,
       "height": 35,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -162,30 +162,30 @@
       "index": "aZ",
       "roundness": null,
       "seed": 1065065897,
-      "version": 486,
-      "versionNonce": 1888892486,
+      "version": 505,
+      "versionNonce": 940030825,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1733386816672,
+      "updated": 1737703691230,
       "link": null,
       "locked": false,
-      "text": "Détection",
+      "text": "Détection et vision",
       "fontSize": 28,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Détection",
+      "originalText": "Détection et vision",
       "autoResize": true,
       "lineHeight": 1.25
     },
     {
       "id": "BUnxDxFOL-cf6PP-SNlyI",
       "type": "text",
-      "x": 1029.3305640668368,
-      "y": 623.8647589351792,
-      "width": 33.594481348991394,
-      "height": 34.77045759699477,
+      "x": 977.1521511924007,
+      "y": 622.8658674408796,
+      "width": 250.03762934062019,
+      "height": 35.76463733896263,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -199,20 +199,20 @@
       "index": "ab",
       "roundness": null,
       "seed": 2088896647,
-      "version": 743,
-      "versionNonce": 2134524186,
+      "version": 784,
+      "versionNonce": 740975977,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1733386843571,
+      "updated": 1737703704915,
       "link": null,
       "locked": false,
-      "text": "IA",
-      "fontSize": 27.816366077595813,
+      "text": "IA et algorithmes",
+      "fontSize": 28.6117098711701,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "IA",
+      "originalText": "IA et algorithmes",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -263,8 +263,8 @@
       "type": "arrow",
       "x": 430.9555864569901,
       "y": 249.46204232888243,
-      "width": 93.41390246547451,
-      "height": 1.2134507053642665,
+      "width": 93.71074286236535,
+      "height": 1.3158697252737852,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -280,11 +280,11 @@
         "type": 2
       },
       "seed": 1708515655,
-      "version": 788,
-      "versionNonce": 661918601,
+      "version": 789,
+      "versionNonce": 543316073,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1733385717202,
+      "updated": 1737703670099,
       "link": null,
       "locked": false,
       "points": [
@@ -293,8 +293,8 @@
           0
         ],
         [
-          93.41390246547451,
-          -1.2134507053642665
+          93.71074286236535,
+          -1.3158697252737852
         ]
       ],
       "lastCommittedPoint": null,
@@ -317,8 +317,8 @@
     {
       "id": "9a0rHYpfJ2I3tF_KGAElP",
       "type": "text",
-      "x": 533.514790204535,
-      "y": 218.5824975931984,
+      "x": 533.8116306014258,
+      "y": 218.2809454439759,
       "width": 463.5957981348038,
       "height": 70,
       "angle": 0,
@@ -334,8 +334,8 @@
       "index": "am",
       "roundness": null,
       "seed": 463963687,
-      "version": 268,
-      "versionNonce": 577025575,
+      "version": 269,
+      "versionNonce": 1733783945,
       "isDeleted": false,
       "boundElements": [
         {
@@ -343,7 +343,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1733385717201,
+      "updated": 1737703670099,
       "link": null,
       "locked": false,
       "text": "Pour mesurer une petite distance\nrelié à un ESP32",
@@ -541,10 +541,10 @@
     {
       "id": "jKwWfI1sdngML89qz_y0Q",
       "type": "text",
-      "x": 534.6225123645622,
-      "y": 381.10286247877093,
+      "x": 534.6178006122306,
+      "y": 385.39970287566183,
       "width": 470.371826171875,
-      "height": 70,
+      "height": 35,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -558,8 +558,8 @@
       "index": "ar",
       "roundness": null,
       "seed": 1002930535,
-      "version": 449,
-      "versionNonce": 965108295,
+      "version": 469,
+      "versionNonce": 660228647,
       "isDeleted": false,
       "boundElements": [
         {
@@ -567,16 +567,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1733385717201,
+      "updated": 1737703669072,
       "link": null,
       "locked": false,
-      "text": "4 boutons reliés à un ESP chacun\ndont un ESP-LCD",
+      "text": "4 boutons reliés à un ESP chacun",
       "fontSize": 28,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "4 boutons reliés à un ESP chacun\ndont un ESP-LCD",
+      "originalText": "4 boutons reliés à un ESP chacun",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -585,8 +585,8 @@
       "type": "arrow",
       "x": 361.32806870405136,
       "y": 410.90956224376885,
-      "width": 165.36221275481842,
-      "height": 0.6853053664745516,
+      "width": 165.35750100248674,
+      "height": 4.165191903123343,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -602,11 +602,11 @@
         "type": 2
       },
       "seed": 980997225,
-      "version": 294,
-      "versionNonce": 1740474121,
+      "version": 314,
+      "versionNonce": 1107062087,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1733385717202,
+      "updated": 1737703669072,
       "link": null,
       "locked": false,
       "points": [
@@ -615,8 +615,8 @@
           0
         ],
         [
-          165.36221275481842,
-          0.6853053664745516
+          165.35750100248674,
+          -4.165191903123343
         ]
       ],
       "lastCommittedPoint": null,
@@ -951,7 +951,7 @@
       "type": "text",
       "x": 1098.6137607551634,
       "y": 330.08027995928427,
-      "width": 247.4781494140625,
+      "width": 144.46009826660156,
       "height": 35.80916912505268,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -966,8 +966,8 @@
       "index": "b02",
       "roundness": null,
       "seed": 1197736935,
-      "version": 631,
-      "versionNonce": 635773190,
+      "version": 637,
+      "versionNonce": 1152078215,
       "isDeleted": false,
       "boundElements": [
         {
@@ -975,16 +975,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1733386816672,
+      "updated": 1737703349332,
       "link": null,
       "locked": false,
-      "text": "2) Identification ",
+      "text": "2) Visage ",
       "fontSize": 28.64733530004214,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "2) Identification ",
+      "originalText": "2) Visage ",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1008,8 +1008,8 @@
       "index": "b03",
       "roundness": null,
       "seed": 1175907751,
-      "version": 811,
-      "versionNonce": 443094918,
+      "version": 819,
+      "versionNonce": 964961223,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1017,26 +1017,26 @@
           "type": "arrow"
         }
       ],
-      "updated": 1733386816672,
+      "updated": 1737703678455,
       "link": null,
       "locked": false,
-      "text": "Utilisation d'une caméra pour \ndétecter des visages (profs)",
+      "text": "Utilisation d'une caméra pour \ndétecter des visages",
       "fontSize": 28,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Utilisation d'une caméra pour \ndétecter des visages (profs)",
+      "originalText": "Utilisation d'une caméra pour \ndétecter des visages",
       "autoResize": true,
       "lineHeight": 1.25
     },
     {
       "id": "QSIo8A2tS1kSsDmffIV_T",
       "type": "arrow",
-      "x": 1350.5976880970593,
-      "y": 348.392750122343,
-      "width": 62.94279788138306,
-      "height": 0.8682749303036417,
+      "x": 1247.5796369495984,
+      "y": 349.2555821446247,
+      "width": 165.960849028844,
+      "height": 2.0349493352105696,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1052,11 +1052,11 @@
         "type": 2
       },
       "seed": 1774851561,
-      "version": 485,
-      "versionNonce": 768511130,
+      "version": 499,
+      "versionNonce": 1358566119,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1733386817038,
+      "updated": 1737703678456,
       "link": null,
       "locked": false,
       "points": [
@@ -1065,8 +1065,8 @@
           0
         ],
         [
-          62.94279788138306,
-          -0.8682749303036417
+          165.960849028844,
+          -2.0349493352105696
         ]
       ],
       "lastCommittedPoint": null,
@@ -1231,7 +1231,7 @@
       "type": "text",
       "x": 1101.1891424142773,
       "y": 517.3720674618737,
-      "width": 181.77801513671875,
+      "width": 211.47767639160156,
       "height": 35.80916912505268,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -1246,8 +1246,8 @@
       "index": "b09",
       "roundness": null,
       "seed": 1678448169,
-      "version": 786,
-      "versionNonce": 1003794822,
+      "version": 796,
+      "versionNonce": 384183113,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1255,16 +1255,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1733386816672,
+      "updated": 1737703344885,
       "link": null,
       "locked": false,
-      "text": "4) Megamind ",
+      "text": "4) Mastermind ",
       "fontSize": 28.64733530004214,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "4) Megamind ",
+      "originalText": "4) Mastermind ",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1313,10 +1313,10 @@
     {
       "id": "2ym0ErCORDeK9mOvyE4g7",
       "type": "arrow",
-      "x": 1294.4949373226077,
-      "y": 533.867580831552,
-      "width": 116.42958150516597,
-      "height": 0.006068220312045014,
+      "x": 1324.1945985774905,
+      "y": 533.8663243300356,
+      "width": 86.72992025028316,
+      "height": 0.004811718795622255,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1332,11 +1332,11 @@
         "type": 2
       },
       "seed": 1165516777,
-      "version": 766,
-      "versionNonce": 870215578,
+      "version": 776,
+      "versionNonce": 1769200169,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1733386817038,
+      "updated": 1737703344886,
       "link": null,
       "locked": false,
       "points": [
@@ -1345,8 +1345,8 @@
           0
         ],
         [
-          116.42958150516597,
-          -0.006068220312045014
+          86.72992025028316,
+          -0.004811718795622255
         ]
       ],
       "lastCommittedPoint": null,
@@ -1723,8 +1723,8 @@
       "type": "text",
       "x": 889.1395166631273,
       "y": 866.5198453413868,
-      "width": 634.2666666666667,
-      "height": 105,
+      "width": 566.1317138671875,
+      "height": 70,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1738,8 +1738,8 @@
       "index": "b0K",
       "roundness": null,
       "seed": 1191259977,
-      "version": 1469,
-      "versionNonce": 503039763,
+      "version": 1478,
+      "versionNonce": 1338574535,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1747,16 +1747,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1737629957267,
+      "updated": 1737703722809,
       "link": null,
       "locked": false,
-      "text": "Utilisation d'un générateur d'image\n(Stable Diffusion + ControlNET) pour trouver\n des informations cachées",
+      "text": "Utilisation d'un générateur d'image pour \ntrouver des informations cachées",
       "fontSize": 28,
       "fontFamily": 1,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Utilisation d'un générateur d'image\n(Stable Diffusion + ControlNET) pour trouver\n des informations cachées",
+      "originalText": "Utilisation d'un générateur d'image pour \ntrouver des informations cachées",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -1766,7 +1766,7 @@
       "x": 800.6977164582362,
       "y": 904.4254528237786,
       "width": 80.60643479094995,
-      "height": 2.7956473798408297,
+      "height": 0.6979945607862419,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1782,11 +1782,11 @@
         "type": 2
       },
       "seed": 1737383465,
-      "version": 1509,
-      "versionNonce": 1740074163,
+      "version": 1517,
+      "versionNonce": 850040295,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1737629957269,
+      "updated": 1737703722810,
       "link": null,
       "locked": false,
       "points": [
@@ -1796,7 +1796,7 @@
         ],
         [
           80.60643479094995,
-          2.7956473798408297
+          -0.6979945607862419
         ]
       ],
       "lastCommittedPoint": null,
