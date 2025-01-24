@@ -1,7 +1,7 @@
-opencv-python>=4.5.5
-keras 
-numpy
-pandas
-roboflow
-supervision
+opencv-python==4.10.0.84
+keras==3.7.0
+numpy==2.0.2
+pandas==2.2.3
+roboflow==1.1.50
+supervision==0.25.1
 paho-mqtt==1.6.1

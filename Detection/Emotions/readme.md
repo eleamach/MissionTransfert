@@ -10,10 +10,6 @@ python -m venv venv_projet
 source venv_projet/bin/activate
 
 pip install -r requirements.txt
-
-# Si erreur cv2.error tester
-pip unistall opencv-python
-pip install opencv-python>=4.5.5
 ```
 
 ### Prérequis
@@ -27,7 +23,10 @@ ls -l /dev/video*
 ```
 
 ### Étapes de lancement 
-Dans le dossier [Emotions](.) lancer la commande : ```bash python detection_emotions.py``` 
+Dans le dossier [Emotions](.) lancer la commande : 
+```bash 
+python detection_emotions.py
+``` 
 Placer correctement les fenetres ouvertes
 
 ## Fonctionnalités
