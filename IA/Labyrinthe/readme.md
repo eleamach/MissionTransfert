@@ -1,13 +1,5 @@
 # Epreuve génération d'image  
 
-## Description 
-
-## Installation
-
-### Prérequis
-
-### Étapes d'installation
-
 ## Fonctionnalités
 
 1. **Principe du jeu**  
