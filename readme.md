@@ -50,7 +50,7 @@ Voir readme des lot d'atelier :
 ## Contact
 
 Pour toute question ou suggestion, n'hésitez pas à nous contacter par email :
-- elea.machillot@cpe.fr
+- me.machillot@cpe.fr ou elea.machillot@cpe.fr
 - julien.perbet@cpe.fr
 - david.jeannin@cpe.fr
 - anais.delcamp@cpe.fr
